@@ -266,25 +266,31 @@
   .vb-hint{font-size:12px;color:var(--accent);margin-left:4px}
 
   /* 轮播 */
-  .carousel{position:relative}
+  .carousel{position:relative;padding:0 56px}
   .car-viewport{overflow:hidden;border-radius:var(--radius);min-height:180px}
   .car-track{display:flex;transition:transform .42s var(--ease)}
   .slide{flex:0 0 100%;max-width:100%;min-width:0;padding:4px;box-sizing:border-box}
   .car-nav{display:flex;align-items:center;justify-content:center;gap:18px;
-    padding:16px 0;border-bottom:1px solid var(--line)}
-  .car-btn{width:52px;height:52px;border-radius:50%;
-    border:1.5px solid var(--line2);background:var(--panel);color:var(--txt);
-    font-size:26px;line-height:1;cursor:pointer;transition:all .16s var(--ease);
+    padding:16px 0;border-bottom:1px solid var(--line);position:relative;overflow-x:auto;overflow-y:hidden;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .car-nav::-webkit-scrollbar{display:none}
+  .car-btn{width:44px;height:44px;border-radius:50%;
+    border:1.5px solid var(--line2);background:var(--panel);color:var(--accent);
+    font-size:22px;line-height:1;cursor:pointer;transition:all .16s var(--ease);
     display:inline-flex;align-items:center;justify-content:center;
-    box-shadow:0 2px 12px rgba(60,45,25,.16);flex-shrink:0}
+    box-shadow:0 2px 12px rgba(60,45,25,.16);flex-shrink:0;
+    position:absolute;top:18px;z-index:5}
+  .car-btn.prev{left:2px}
+  .car-btn.next{right:2px}
   .car-btn:hover:not(:disabled){background:var(--accent);color:#fff;border-color:var(--accent);
-    box-shadow:0 6px 18px rgba(210,105,30,.28);transform:translateY(-2px)}
-  .car-btn:disabled{opacity:.24;cursor:default;transform:none}
+    box-shadow:0 6px 18px rgba(210,105,30,.28);transform:scale(1.08)}
+  .car-btn:disabled{opacity:.24;cursor:default}
   .car-progress{position:absolute;top:14px;right:16px;font-size:13px;color:var(--txt2);
     background:rgba(255,253,248,.92);padding:5px 13px;border-radius:14px;z-index:3;pointer-events:none;border:1px solid var(--line2);
     backdrop-filter:blur(6px)}
   .car-progress b{color:var(--accent);font-weight:700;font-size:15px}
-  .car-dots{display:flex;gap:10px;align-items:center}
+  .car-dots{display:flex;gap:8px;align-items:center;justify-content:center;
+    flex-wrap:nowrap;max-width:100%;padding:0 4px}
   .car-dot{width:11px;height:11px;border-radius:50%;background:var(--line2);
     cursor:pointer;transition:all .22s ease;border:none}
   .car-dot:hover:not(.active){background:var(--txt3);transform:scale(1.3)}
@@ -1375,11 +1381,11 @@ function renderCards(){
   byId("cards").innerHTML = `
     <div class="car-back"><button class="idx-back" id="backToIndex" type="button">返回脉络目录</button></div>
     <div class="carousel">
+      <button class="car-btn prev" type="button" aria-label="上一条">‹</button>
       <div class="car-nav">
-        <button class="car-btn prev" type="button" aria-label="上一条">‹</button>
         <div class="car-dots">${dots}</div>
-        <button class="car-btn next" type="button" aria-label="下一条">›</button>
       </div>
+      <button class="car-btn next" type="button" aria-label="下一条">›</button>
       <div class="car-viewport">
         <div class="car-track">${slidesHtml}</div>
         <div class="car-progress"><b id="carPos">${state.carIndex+1}</b> / ${list.length}</div>
