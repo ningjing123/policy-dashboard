@@ -322,11 +322,17 @@
   .idx-cnt{font-size:12px;color:var(--txt3);white-space:nowrap}
   .idx-arrow{font-size:22px;color:var(--txt3);line-height:1;transition:transform .2s var(--ease)}
   .idx-row:hover .idx-arrow{color:var(--accent);transform:translateX(4px)}
-  .car-back{margin-bottom:10px}
-  .idx-back{background:transparent;border:none;color:var(--accent);font-size:13px;
-    font-weight:600;cursor:pointer;padding:7px 10px;border-radius:8px;font-family:inherit;
-    transition:background .14s}
-  .idx-back:hover{background:var(--accent-soft)}
+  .car-back{margin-bottom:14px;padding:10px 12px;background:rgba(45,106,79,.07);
+    border:1px solid rgba(45,106,79,.20);border-radius:12px;display:flex}
+  .idx-back{display:inline-flex;align-items:center;gap:7px;
+    background:var(--accent);color:#fff;font-size:14px;font-weight:700;cursor:pointer;
+    padding:9px 18px;border:none;border-radius:999px;font-family:inherit;
+    transition:transform .12s,box-shadow .15s,filter .15s;
+    box-shadow:0 2px 8px rgba(45,106,79,.25)}
+  .idx-back::before{content:"\2039";font-size:18px;line-height:1;font-weight:800;margin-top:-1px}
+  .idx-back:hover{filter:brightness(1.08);transform:translateX(-2px);
+    box-shadow:0 4px 12px rgba(45,106,79,.32)}
+  .idx-back:active{transform:translateX(-4px)}
   @keyframes riseIn{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
   @media(max-width:680px){
     .idx-right{flex-direction:column;align-items:flex-end;gap:5px}
@@ -1367,7 +1373,7 @@ function renderCards(){
   const slidesHtml = list.map(s=>`<div class="slide">${renderStoryCard(s)}</div>`).join("");
   const dots = list.map((s,i)=>`<span class="car-dot ${i===state.carIndex?'active':''}" data-i="${i}"></span>`).join("");
   byId("cards").innerHTML = `
-    <div class="car-back"><button class="idx-back" id="backToIndex" type="button">‹ 返回脉络目录</button></div>
+    <div class="car-back"><button class="idx-back" id="backToIndex" type="button">返回脉络目录</button></div>
     <div class="carousel">
       <div class="car-nav">
         <button class="car-btn prev" type="button" aria-label="上一条">‹</button>
