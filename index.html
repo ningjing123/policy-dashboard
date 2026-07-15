@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>时政新闻分析看板 · 从碎片新闻看清政策大局</title>
+<style>
+  :root{
+    --bg:#f4f1e8; --bg2:#faf7f0; --panel:#fffdf7; --panel2:#efeadd;
+    --line:#e3ddcd; --line2:#d3ccb7;
+    --txt:#2a2d26; --txt2:#54584c; --txt3:#8b8b7c;
+    --accent:#2d6a4f; --accent-soft:rgba(45,106,79,.08); --accent-line:rgba(45,106,79,.34);
+    --money:#a9781f; --money-bg:rgba(169,120,31,.11); --money-line:rgba(169,120,31,.34);
+    --power:#2a7d8c; --power-bg:rgba(42,125,140,.11); --power-line:rgba(42,125,140,.34);
+    --rule:#8a5a72; --rule-bg:rgba(138,90,114,.11);
+    --ok:#4f9d5a; --ok-bg:rgba(79,157,90,.13); --ok-line:rgba(79,157,90,.36);
+    --warn:#b07d1e; --pending:#8b8b7c;
+    --serif:"Songti SC","Source Han Serif SC","Noto Serif CJK SC",STSong,SimSun,serif;
+    --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --radius:14px; --radius-sm:10px;
+    --shadow:0 10px 30px rgba(20,24,35,.12);
+    --ease:cubic-bezier(.2,.8,.2,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:
+      radial-gradient(1100px 620px at 82% -12%,rgba(45,106,79,.08),transparent 55%),
+      var(--bg);
+    color:var(--txt);font-family:var(--sans);font-size:15px;line-height:1.62;
+    -webkit-font-smoothing:antialiased;min-height:100vh;background-attachment:fixed}
+  .wrap{max-width:1180px;margin:0 auto;padding:34px 24px 80px}
+  .wrap::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,var(--accent),transparent 72%);z-index:50}
+
+  /* ---------- Header ---------- */
+  header.hd{margin-bottom:24px}
+  .hd-title{font-family:var(--serif);font-size:clamp(24px,3.2vw,32px);font-weight:800;
+    letter-spacing:.5px;display:flex;align-items:center;gap:13px;color:var(--txt)}
+  .hd-title .dot{width:11px;height:11px;border-radius:2px;background:var(--accent)}
+  .hd-sub{color:var(--txt2);font-size:14.5px;margin-top:9px;max-width:780px}
+  .hd-stats-row{display:flex;align-items:center;gap:14px;margin-top:20px;flex-wrap:wrap}
+  .hd-stats{display:flex;align-items:center;gap:0;flex-wrap:wrap}
+  .stat{display:flex;align-items:baseline;gap:7px;padding:0 20px 0 0;position:relative}
+  .stat:not(:last-child)::after{content:"";position:absolute;right:0;top:-3px;bottom:-3px;width:1px;background:var(--line)}
+  .stat b{font-family:var(--serif);font-size:23px;font-weight:700;color:var(--accent);line-height:1}
+  .stat span{font-size:12.5px;color:var(--txt3)}
+  .disclaimer{margin-top:18px;font-size:12.5px;color:var(--txt3);
+    background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--warn);
+    border-radius:8px;padding:10px 14px;display:flex;gap:9px;align-items:flex-start;line-height:1.7}
+  .disclaimer b{color:var(--warn);font-weight:700}
+
+  /* ---------- Tabs (Layer 1) ---------- */
+  .tabs-label{font-size:11.5px;color:var(--txt3);letter-spacing:3px;margin:30px 0 0;text-transform:uppercase;
+    font-family:var(--serif)}
+  .tabs-label::before{content:"";display:inline-block;width:18px;height:2px;background:var(--accent);
+    vertical-align:middle;margin-right:9px}
+  .tabs{display:flex;gap:2px;flex-wrap:wrap;border-bottom:1px solid var(--line);margin-top:10px}
+  .tab{position:relative;background:transparent;border:none;color:var(--txt3);
+    padding:11px 15px;cursor:pointer;font-size:14.5px;font-weight:600;
+    transition:color .18s ease;user-select:none;font-family:var(--sans)}
+  .tab .cnt{font-size:11px;font-weight:700;margin-left:6px;opacity:.6;color:var(--txt3)}
+  .tab:hover{color:var(--txt)}
+  .tab.active{color:var(--accent)}
+  .tab.active .cnt{color:var(--accent);opacity:1}
+  .tab::after{content:"";position:absolute;left:12px;right:12px;bottom:-1px;height:2px;
+    background:var(--accent);transform:scaleX(0);transform-origin:center;transition:transform .26s var(--ease)}
+  .tab.active::after{transform:scaleX(1)}
+  .tab.empty{opacity:.4}
+  .tab.empty.active{opacity:1}
+
+  /* ---------- Filter bar (Layer 2 secondary) ---------- */
+  .filters{display:flex;gap:20px;flex-wrap:wrap;align-items:center;
+    margin:22px 0 10px;padding:14px 18px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-sm)}
+  .fgroup{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .fgroup .flabel{font-size:12px;color:var(--txt3);margin-right:2px;letter-spacing:.5px}
+  .chip{border:1px solid var(--line2);background:transparent;color:var(--txt2);
+    padding:5px 13px;border-radius:16px;cursor:pointer;font-size:12.5px;transition:all .16s var(--ease);font-family:var(--sans)}
+  .chip:hover{color:var(--txt);border-color:var(--txt3)}
+  .chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .chip.on.money{background:var(--money);border-color:var(--money);color:#2a1d00}
+  .chip.on.power{background:var(--power);border-color:var(--power);color:#04201d}
+  .reset{margin-left:auto;font-size:12.5px;color:var(--txt3);cursor:pointer;
+    text-decoration:underline;text-underline-offset:3px;transition:color .14s}
+  .reset:hover{color:var(--accent)}
+
+  /* ---------- Story cards ---------- */
+  .cards{margin-top:22px;display:flex;flex-direction:column;gap:18px}
+  .story{background:linear-gradient(180deg,var(--panel),var(--bg2));
+    border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:var(--radius);
+    overflow:hidden;box-shadow:var(--shadow);animation:riseIn .42s var(--ease) both}
+  .story-hd{padding:18px 22px;display:flex;align-items:flex-start;gap:14px;
+    border-bottom:1px solid var(--line);transition:background .15s}
+  .sh-main{flex:1;min-width:0}
+  .sh-line{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .sh-name{font-size:18.5px;font-weight:800}
+  .sh-meta{color:var(--txt3);font-size:12.5px;margin-top:6px;display:flex;gap:15px;flex-wrap:wrap}
+  .sh-meta b{color:var(--txt2);font-weight:600}
+  .closed-badge{font-size:12px;font-weight:800;padding:5px 13px;border-radius:20px;white-space:nowrap;letter-spacing:.5px}
+  .closed-badge.yes{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
+  .closed-badge.no{background:rgba(120,125,133),.12);color:var(--txt3);border:1px solid var(--line2)}
+  .toggle{color:var(--txt3);font-size:12px;display:flex;align-items:center;gap:5px;white-space:nowrap;padding-top:3px}
+  .toggle .arw{transition:transform .2s}
+  .story.open .toggle .arw{transform:rotate(90deg)}
+  .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+  .tag{font-size:11.5px;color:var(--txt2);background:rgba(35,38,43,.05);
+    border:1px solid var(--line);border-radius:6px;padding:2px 9px}
+  .tag.hot{color:var(--accent);border-color:var(--accent-line);background:var(--accent-soft)}
+  .tag.primary{color:#fff;background:var(--accent);border-color:var(--accent);font-weight:600}
+
+  /* six-step checklist */
+  .steps{padding:8px 22px 22px}
+  .step{display:flex;gap:16px;padding:14px 0;border-top:1px solid var(--line)}
+  .step:first-child{border-top:none}
+  .step-tag{flex:0 0 122px;display:flex;flex-direction:column;gap:3px}
+  .step-no{font-size:11px;font-weight:800;color:var(--accent);letter-spacing:1.5px}
+  .step-name{font-size:13.5px;font-weight:700;color:var(--txt)}
+  .step-body{flex:1;min-width:0}
+
+  .actor-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .acol{border-radius:var(--radius-sm);padding:12px 14px}
+  .acol.money{background:var(--money-bg);border:1px solid var(--money-line)}
+  .acol.power{background:var(--power-bg);border:1px solid var(--power-line)}
+  .acol-hd{font-size:12px;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+  .acol.money .acol-hd{color:var(--money)}
+  .acol.power .acol-hd{color:var(--power)}
+  .actor{font-size:13px;color:var(--txt);padding:3px 0;display:flex;justify-content:space-between;gap:8px}
+  .actor .act{color:var(--txt3);font-size:12px}
+  .none{color:var(--txt3);font-size:12.5px;font-style:italic}
+
+  .rules{display:flex;gap:7px;flex-wrap:wrap}
+  .rule-pill{font-size:12px;color:var(--rule);background:var(--rule-bg);
+    border:1px solid rgba(185,139,217,.3);border-radius:6px;padding:3px 10px}
+
+  .parties{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+  .party{font-size:12.5px;color:var(--txt2);background:rgba(35,38,43,.05);border:1px solid var(--line);border-radius:6px;padding:2px 9px}
+  .party.lead{color:#fff;background:var(--accent);border-color:var(--accent);font-weight:600}
+  .cross{font-size:11.5px;color:var(--warn);font-weight:700;margin-left:4px}
+
+  .qual{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .badge{font-size:11.5px;font-weight:700;border-radius:6px;padding:3px 10px;border:1px solid var(--line2);color:var(--txt2)}
+  .badge.lv{color:#c0623a;border-color:rgba(192,98,58,.4);background:rgba(192,98,58,.1)}
+  .badge.imp-high{color:#d6452f;border-color:rgba(214,69,47,.4);background:rgba(214,69,47,.1)}
+  .badge.imp-medium{color:var(--warn);border-color:rgba(224,169,58,.4);background:rgba(224,169,58,.1)}
+
+  /* timeline */
+  .tl{position:relative;padding-left:4px}
+  .tl-item{display:flex;gap:12px;padding:7px 0;position:relative;color:inherit;text-decoration:none}
+  a.tl-item{color:inherit;text-decoration:none}
+  .tl-node{flex:0 0 12px;display:flex;flex-direction:column;align-items:center;padding-top:5px}
+  .tl-node .d{width:11px;height:11px;border-radius:50%;background:var(--panel);border:2px solid var(--line2);z-index:1;transition:all .2s}
+  .tl-item.done .tl-node .d{background:var(--accent);border-color:var(--accent)}
+  .tl-item.pending .tl-node .d{border-style:dashed}
+  .tl-node .bar{flex:1;width:2px;background:var(--line);margin-top:2px}
+  .tl-item:last-child .tl-node .bar{display:none}
+  .tl-body{flex:1;padding-bottom:6px}
+  .tl-stage{font-size:11px;font-weight:800;color:var(--txt3);letter-spacing:.5px}
+  .tl-title{font-size:13.5px;color:var(--txt);margin-top:1px}
+  .tl-date{font-size:11.5px;color:var(--txt3);margin-top:2px}
+  .incub{margin-top:10px;font-size:12px;color:var(--money);background:var(--money-bg);
+    border:1px solid var(--money-line);border-radius:7px;padding:8px 12px;line-height:1.6}
+  .incub b{color:var(--money)}
+
+  /* closure step */
+  .closure{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .cl-item{font-size:12.5px;font-weight:700;padding:5px 13px;border-radius:8px;border:1px solid var(--line2);color:var(--txt3);display:flex;gap:6px;align-items:center}
+  .cl-item.on.money{color:var(--money);border-color:var(--money-line);background:var(--money-bg)}
+  .cl-item.on.power{color:var(--power);border-color:var(--power-line);background:var(--power-bg)}
+  .cl-final{font-size:13px;font-weight:800;padding:5px 14px;border-radius:8px}
+  .cl-final.yes{color:var(--ok);background:var(--ok-bg);border:1px solid var(--ok-line)}
+  .cl-final.no{color:var(--txt3);background:rgba(120,125,133),.1);border:1px solid var(--line2)}
+
+  /* macro chain */
+  .macro{display:flex;align-items:stretch;gap:0;flex-wrap:wrap}
+  .macro-node{flex:1;min-width:120px;background:var(--panel2);border:1px solid var(--line);
+    border-radius:var(--radius-sm);padding:11px 13px}
+  .macro-node .mn-lb{font-size:11px;color:var(--txt3);font-weight:700;margin-bottom:5px;letter-spacing:.5px}
+  .macro-node .mn-v{font-size:12.5px;color:var(--txt2);line-height:1.55}
+  .macro-arrow{flex:0 0 26px;display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:16px}
+
+  /* detail (per-news) */
+  .detail{border-top:1px solid var(--line);background:rgba(35,38,43,.05);padding:0}
+  .detail-inner{padding:17px 22px}
+  .detail-hd{font-size:11px;color:var(--txt3);letter-spacing:1.5px;margin-bottom:13px;text-transform:uppercase;font-family:var(--serif)}
+
+  /* steps collapsible (default folded) */
+  .steps-details{border-top:1px solid var(--line);background:rgba(35,38,43,.03)}
+  .steps-details > summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;
+    padding:14px 22px;user-select:none;transition:background .15s}
+  .steps-details > summary::-webkit-details-marker{display:none}
+  .steps-details > summary:hover{background:rgba(35,38,43,.06)}
+  .sd-title{font-family:var(--serif);font-size:14.5px;font-weight:800;color:var(--txt)}
+  .sd-status{font-size:11.5px;font-weight:700;padding:3px 11px;border-radius:14px;border:1px solid var(--line2);color:var(--txt3);white-space:nowrap}
+  .sd-status.ok{color:var(--ok);background:var(--ok-bg);border-color:var(--ok-line)}
+  .sd-status.pending{color:var(--txt3);background:rgba(120,125,133),.1);border-color:var(--line2)}
+  .sd-arw{margin-left:auto;color:var(--txt3);font-size:13px;transition:transform .2s}
+  .steps-details[open] > summary .sd-arw{transform:rotate(90deg)}
+  .steps-details[open] > summary{border-bottom:1px solid var(--line)}
+  .news{border:1px solid var(--line);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:11px;background:var(--panel)}
+  .news:last-child{margin-bottom:0}
+  .news-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start}
+  .news-title{font-size:14.5px;font-weight:700;flex:1;min-width:0;line-height:1.5}
+  .news-src{font-size:11.5px;color:var(--txt3);white-space:nowrap}
+  .news-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px 18px;margin-top:11px}
+  .nf{font-size:12.5px}
+  .nf .k{color:var(--txt3);font-size:11px;letter-spacing:.3px}
+  .nf .v{color:var(--txt2)}
+  .news-summary .v{max-height:170px;overflow:auto;line-height:1.7;color:#5d5240;
+    background:rgba(35,38,43,.04);border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-size:13px}
+  .mini-role{display:inline-block;font-size:11px;padding:1px 7px;border-radius:5px;margin:2px 4px 0 0}
+  .mini-role.money{color:var(--money);background:var(--money-bg)}
+  .mini-role.power{color:var(--power);background:var(--power-bg)}
+
+  /* clickable timeline item */
+  .tl-item.clickable{cursor:pointer;border-radius:8px;transition:background .14s;margin:0 -8px;padding-left:8px;padding-right:8px}
+  .tl-item.clickable:hover{background:var(--accent-soft)}
+  .tl-item.clickable:hover .tl-title{color:var(--accent)}
+  .tl-open{font-size:11.5px;color:var(--accent);font-weight:700;margin-left:8px;white-space:nowrap;opacity:.85}
+  .news-open{font-size:11.5px;color:var(--accent);font-weight:700;cursor:pointer;margin-left:6px;white-space:nowrap;text-decoration:none}
+  .news-open:hover{text-decoration:underline;text-underline-offset:2px}
+
+  /* ---------- Modal (news full view) ---------- */
+  .modal-mask{position:fixed;inset:0;background:rgba(45,35,22,.42);backdrop-filter:blur(3px);
+    display:none;align-items:flex-start;justify-content:center;padding:48px 18px;z-index:100;overflow-y:auto}
+  .modal-mask.show{display:flex;animation:fadein .18s ease}
+  @keyframes fadein{from{opacity:0}to{opacity:1}}
+  .modal{position:relative;width:100%;max-width:680px;background:linear-gradient(180deg,var(--panel),var(--bg2));
+    border:1px solid var(--line2);border-top:3px solid var(--accent);border-radius:var(--radius);box-shadow:0 24px 70px rgba(60,45,25,.18);
+    padding:26px 28px 28px;animation:slideup .22s var(--ease)}
+  @keyframes slideup{from{transform:translateY(16px);opacity:.4}to{transform:translateY(0);opacity:1}}
+  .modal-close{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:8px;
+    background:rgba(35,38,43,.06);border:1px solid var(--line2);color:var(--txt2);
+    font-size:15px;cursor:pointer;transition:all .14s;line-height:1}
+  .modal-close:hover{background:rgba(35,38,43,.1);color:var(--txt)}
+  .m-tags{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
+  .m-badge{font-size:11.5px;font-weight:700;border-radius:6px;padding:3px 10px;border:1px solid var(--line2);color:var(--txt2)}
+  .m-badge.stage{color:var(--accent);border-color:var(--accent-line);background:var(--accent-soft)}
+  .m-badge.lv{color:#c0623a;border-color:rgba(192,98,58,.4);background:rgba(192,98,58,.1)}
+  .m-badge.imp-high{color:#d6452f;border-color:rgba(214,69,47,.4);background:rgba(214,69,47,.1)}
+  .m-badge.imp-medium{color:var(--warn);border-color:rgba(224,169,58,.4);background:rgba(224,169,58,.1)}
+  .m-title{font-size:21px;font-weight:800;line-height:1.42;margin-bottom:8px;padding-right:30px}
+  .m-src{font-size:12.5px;color:var(--txt3);padding-bottom:14px;border-bottom:1px solid var(--line);
+    display:flex;gap:14px;flex-wrap:wrap}
+  .m-src b{color:var(--txt2);font-weight:600}
+  .m-body{padding:16px 0;font-size:14.5px;color:var(--txt);line-height:1.85}
+  .m-body p{margin-bottom:12px}
+  .m-body p:last-child{margin-bottom:0}
+  .m-incub{font-size:12.5px;color:var(--money);background:var(--money-bg);border:1px solid var(--money-line);
+    border-radius:8px;padding:9px 13px;margin:2px 0 14px}
+  .m-attrs{border-top:1px solid var(--line);padding-top:14px}
+  .m-attrs-hd{font-size:11px;color:var(--txt3);letter-spacing:1px;text-transform:uppercase;margin-bottom:11px;font-family:var(--serif)}
+  .m-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:11px 20px}
+  .m-field .mk{font-size:11px;color:var(--txt3);margin-bottom:3px}
+  .m-field .mv{font-size:13px;color:var(--txt2)}
+  .m-role{display:inline-block;font-size:11.5px;padding:2px 8px;border-radius:5px;margin:3px 5px 0 0}
+  .m-role.money{color:var(--money);background:var(--money-bg)}
+  .m-role.power{color:var(--power);background:var(--power-bg)}
+  .m-rule{display:inline-block;font-size:11.5px;color:var(--rule);background:var(--rule-bg);
+    border:1px solid rgba(185,139,217,.3);border-radius:5px;padding:2px 8px;margin:3px 5px 0 0}
+
+  /* ---------- 视图切换（列表 / 聚焦轮播）—— 放在统计栏右侧 ---------- */
+  .viewbar{display:inline-flex;align-items:center;gap:10px;margin-left:auto}
+  .vb-label{font-size:13px;color:var(--txt2);font-weight:600;white-space:nowrap}
+  .seg{display:inline-flex;background:var(--panel);border:1px solid var(--line2);border-radius:11px;padding:3px;box-shadow:0 1px 6px rgba(60,45,25,.14)}
+  .seg-btn{border:none;background:transparent;color:var(--txt2);font-size:13.5px;font-weight:600;padding:7px 19px;border-radius:8px;cursor:pointer;transition:all .18s var(--ease);font-family:var(--sans)}
+  .seg-btn.active{background:var(--accent);color:#fff;box-shadow:0 2px 10px rgba(45,106,79,.30)}
+  .seg-btn:hover:not(.active){color:var(--txt);background:rgba(35,38,43,.05)}
+  .vb-hint{font-size:12px;color:var(--accent);margin-left:4px}
+
+  /* 轮播 */
+  .carousel{position:relative}
+  .car-viewport{overflow:hidden;border-radius:var(--radius);min-height:180px}
+  .car-track{display:flex;transition:transform .42s var(--ease)}
+  .slide{flex:0 0 100%;max-width:100%;min-width:0;padding:4px;box-sizing:border-box}
+  .car-nav{display:flex;align-items:center;justify-content:center;gap:18px;
+    padding:16px 0;border-bottom:1px solid var(--line)}
+  .car-btn{width:52px;height:52px;border-radius:50%;
+    border:1.5px solid var(--line2);background:var(--panel);color:var(--txt);
+    font-size:26px;line-height:1;cursor:pointer;transition:all .16s var(--ease);
+    display:inline-flex;align-items:center;justify-content:center;
+    box-shadow:0 2px 12px rgba(60,45,25,.16);flex-shrink:0}
+  .car-btn:hover:not(:disabled){background:var(--accent);color:#fff;border-color:var(--accent);
+    box-shadow:0 6px 18px rgba(45,106,79,.28);transform:translateY(-2px)}
+  .car-btn:disabled{opacity:.24;cursor:default;transform:none}
+  .car-progress{position:absolute;top:14px;right:16px;font-size:13px;color:var(--txt2);
+    background:rgba(255,253,248,.92);padding:5px 13px;border-radius:14px;z-index:3;pointer-events:none;border:1px solid var(--line2);
+    backdrop-filter:blur(6px)}
+  .car-progress b{color:var(--accent);font-weight:700;font-size:15px}
+  .car-dots{display:flex;gap:10px;align-items:center}
+  .car-dot{width:11px;height:11px;border-radius:50%;background:var(--line2);
+    cursor:pointer;transition:all .22s ease;border:none}
+  .car-dot:hover:not(.active){background:var(--txt3);transform:scale(1.3)}
+  .car-dot.active{background:var(--accent);width:30px;height:11px;border-radius:6px;
+    box-shadow:0 0 10px rgba(45,106,79,.42)}
+
+  /* ---------- 脉络目录（下钻入口） ---------- */
+  .idx-head{font-size:13.5px;color:var(--txt2);margin:6px 2px 16px;
+    font-family:var(--serif);letter-spacing:.5px}
+  .idx-head b{color:var(--accent);font-family:var(--serif)}
+  .idx-list{display:flex;flex-direction:column}
+  .idx-row{position:relative;display:flex;align-items:center;gap:16px;width:100%;text-align:left;
+    background:transparent;border:none;border-bottom:1px solid var(--line);border-radius:0;
+    padding:16px 14px;cursor:pointer;color:var(--txt);font-family:inherit;
+    transition:background .2s var(--ease),padding-left .2s var(--ease);animation:riseIn .4s var(--ease) both}
+  .idx-row::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:3px;
+    background:var(--accent);transform:scaleY(0);transform-origin:center;transition:transform .22s var(--ease)}
+  .idx-row:hover{background:var(--accent-soft);padding-left:22px}
+  .idx-row:hover::before{transform:scaleY(1)}
+  .idx-no{flex:0 0 auto;width:30px;height:30px;border-radius:8px;background:var(--panel2);
+    color:var(--accent);font-family:var(--serif);font-size:15px;font-weight:700;
+    display:inline-flex;align-items:center;justify-content:center;transition:all .2s var(--ease)}
+  .idx-row:hover .idx-no{background:var(--accent);color:#fff}
+  .idx-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+  .idx-title{font-size:15.5px;font-weight:600;color:var(--txt);line-height:1.45}
+  .idx-meta{font-size:12px;color:var(--txt3);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .idx-tag{font-size:11px;color:var(--accent);background:var(--accent-soft);
+    border:1px solid var(--accent-line);border-radius:8px;padding:1px 7px}
+  .idx-tag.primary{font-weight:700;border-color:var(--accent)}
+  .idx-right{flex:0 0 auto;display:flex;align-items:center;gap:10px}
+  .idx-stage{font-size:11px;color:var(--warn);background:rgba(224,169,58,.12);
+    border:1px solid rgba(224,169,58,.32);border-radius:9px;padding:2px 9px;white-space:nowrap}
+  .idx-closed{font-size:11px;color:var(--ok);background:var(--ok-bg);
+    border:1px solid var(--ok-line);border-radius:9px;padding:2px 9px}
+  .idx-cnt{font-size:12px;color:var(--txt3);white-space:nowrap}
+  .idx-arrow{font-size:22px;color:var(--txt3);line-height:1;transition:transform .2s var(--ease)}
+  .idx-row:hover .idx-arrow{color:var(--accent);transform:translateX(4px)}
+  .car-back{margin-bottom:10px}
+  .idx-back{background:transparent;border:none;color:var(--accent);font-size:13px;
+    font-weight:600;cursor:pointer;padding:7px 10px;border-radius:8px;font-family:inherit;
+    transition:background .14s}
+  .idx-back:hover{background:var(--accent-soft)}
+  @keyframes riseIn{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+  @media(max-width:680px){
+    .idx-right{flex-direction:column;align-items:flex-end;gap:5px}
+    .idx-title{font-size:14px}
+    .idx-arrow{display:none}
+  }
+
+  .empty{text-align:center;padding:72px 20px;color:var(--txt3)}
+  .empty .big{font-size:44px;margin-bottom:12px;opacity:.6}
+
+  footer{margin-top:42px;text-align:center;color:var(--txt3);font-size:12px;line-height:1.95;
+    border-top:1px solid var(--line);padding-top:22px}
+  footer a{color:var(--txt2);text-decoration:none}
+
+  @media(max-width:680px){
+    .actor-cols{grid-template-columns:1fr}
+    .step-tag{flex-basis:100px}
+    .hd-title{font-size:23px}
+    .macro-arrow{flex-basis:100%;height:20px;transform:rotate(90deg)}
+    .viewbar{margin-left:0;width:100%;justify-content:space-between}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hd">
+    <div class="hd-title"><span class="dot"></span>时政新闻分析看板</div>
+    <div class="hd-sub">从碎片新闻 → 看清政策背后的完整大局 ｜ 钱袋子·权袋子 + 过程追踪六步法</div>
+    <div class="hd-stats-row">
+      <div class="hd-stats" id="stats"></div>
+      <div class="viewbar">
+        <span class="vb-label">展示</span>
+        <div class="seg" id="seg">
+          <button class="seg-btn active" data-view="index" type="button">脉络目录</button>
+          <button class="seg-btn" data-view="carousel" type="button">聚焦阅读</button>
+        </div>
+        <span class="vb-hint" id="vbHint"></span>
+      </div>
+    </div>
+    <div class="disclaimer"><b>● 实时数据</b><span>新闻由脚本每日自动抓取自 <b>中国政府网</b>，标题/日期/链接均为真实来源，点击「查看原文 ↗」直达政府网详情页。「六步法」标注为<b>规则版自动生成</b>（钱袋子/权袋子/制度/时间仅供参考，语义精度低于人工，可由每日 AI 任务精修）。</span></div>
+  </header>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div class="filters" id="filters">
+    <div class="fgroup">
+      <span class="flabel">钱/权</span>
+      <button class="chip money" data-f="role" data-v="钱袋子">钱袋子</button>
+      <button class="chip power" data-f="role" data-v="权袋子">权袋子</button>
+    </div>
+    <div class="fgroup">
+      <span class="flabel">阶段</span>
+      <span id="stageChips"></span>
+    </div>
+    <div class="fgroup">
+      <span class="flabel">层级</span>
+      <span id="levelChips"></span>
+    </div>
+    <span class="reset" id="reset">清除筛选</span>
+  </div>
+
+  <div class="cards" id="cards"></div>
+
+  <footer>
+    时政新闻分析看板 · 单文件原型 v1.2 ｜ 方法论依据：钱袋子/权袋子框架 + 过程追踪六步法<br>
+    第一层「民生影响域」解决"按领域找内容"，第二层「六步法常驻 Checklist」揭示政策落地机制
+  </footer>
+</div>
+
+<script id="app">
+/* ================= 数据 =================
+   本区块由 update_news.py 自动抓取中国政府网最新政策后重生成。
+   存储设计 A：NEWS = 热库(news_data.json, 近30天) + 冷库(news_cold.json, >30天长线/未闭环) 合并。
+   ⚠️ NEWS_DATA_START / NEWS_DATA_END 之间的内容会被脚本整体替换，请勿在其间手改。 */
+/* NEWS_DATA_START */
+/* 自动更新于 2026-07-15 16:09，共 83 条，来源：gov.cn 政策文件库官方检索接口 */
+const NEWS = [
+  { id:"n1", title:"国务院办公厅关于转发生态环境部等部门《群众身边水体保护治理行动方案》的通知", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-14",
+    story_line:"群众身边水体保护治理行动方案", stage:"细则落地", cross_dept:false,
+    lead_dept:"国务院办公厅", support_depts:[],
+    actors:[{name:"国务院办公厅", role:"权袋子", action:"群众身边水体保护治理行动方案"}], rules:["群众身边水体保护治理行动方案"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["环保"], primary_tag:"环保",
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7075365.htm", summary:"国务院办公厅关于转发生态环境部等部门 《群众身边水体保护治理行动方案》的通知 国办函〔2026〕65号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 生态环境部、国家发展改革委、工业和信息...", doc_no:"国办函〔2026〕65号", pub_org:"国务院办公厅" },
+  { id:"n2", title:"生态环境部等部门采取行动保护治理群众身边水环境", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-14",
+    story_line:"生态环境部等部门采取行动保护治理群众身边水环境", stage:"公布执行", cross_dept:false,
+    lead_dept:"生态环境部", support_depts:[],
+    actors:[{name:"生态环境部", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["环保"], primary_tag:"环保",
+    link:"https://www.gov.cn/yaowen/liebiao/202607/content_7075406.htm", summary:"", doc_no:"", pub_org:"新华社" },
+  { id:"n3", title:"关于印发《固体废物污染防治“十五五”规划》的通知", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-14",
+    story_line:"固体废物污染防治\"十五五\"规划", stage:"公布执行", cross_dept:true,
+    lead_dept:"生态环境部", support_depts:["国家发展改革委", "工业和信息化部", "住房城乡建设部", "农业农村部", "商务部"],
+    actors:[{name:"生态环境部", role:"权袋子", action:"固体废物污染防治“十五五”规划"}, {name:"国家发展改革委", role:"权袋子", action:"固体废物污染防治“十五五”规划"}, {name:"工业和信息化部", role:"权袋子", action:"固体废物污染防治“十五五”规划"}, {name:"住房城乡建设部", role:"权袋子", action:"固体废物污染防治“十五五”规划"}, {name:"农业农村部", role:"权袋子", action:"固体废物污染防治“十五五”规划"}, {name:"商务部", role:"权袋子", action:"固体废物污染防治“十五五”规划"}], rules:["固体废物污染防治“十五五”规划"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["环保"], primary_tag:"环保",
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7075414.htm", summary:"关于印发《固体废物污染防治“十五五”规划》的通知 环固体〔2026〕39号 各省、自治区、直辖市及新疆生产建设兵团生态环境厅（局）、发展改革委、工业和信息化主管部门、住房城乡建设厅（委、管委、局）、农...", doc_no:"环固体〔2026〕39号", pub_org:"生态环境部 国家发展改革委 工业和信息化部 住房城乡建设部 农业农村部 商务部" },
+  { id:"n4", title:"国家卫生健康委 国家中医药管理局 国家疾病预防控制局关于进一步做好公立医疗卫生机构医用设备集中采购工作的通知", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-14",
+    story_line:"国家卫生健康委 国家中医药管理局 国家疾病预防控制局关于进一步做好公立医疗卫生机构医用设备集中采购工作的通知", stage:"细则落地", cross_dept:true,
+    lead_dept:"国家卫生健康委", support_depts:["国家中医药管理局", "国家疾病预防控制局"],
+    actors:[{name:"国家卫生健康委", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家中医药管理局", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家疾病预防控制局", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["健康"], primary_tag:"健康",
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7075358.htm", summary:"国家卫生健康委 国家中医药管理局 国家疾病预防控制局关于进一步做好公立医疗卫生机构医用设备集中采购工作的通知 国卫财务函〔2026〕131号 各省、自治区、直辖市及新疆生产建设兵团卫生健康委、中医药局...", doc_no:"国卫财务函〔2026〕131号", pub_org:"国家卫生健康委 国家中医药局 国家疾控局" },
+  { id:"n5", title:"四部门关于推动互联网基础资源高质量发展的指导意见", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-14",
+    story_line:"四部门关于推动互联网基础资源高质量发展的指导意见", stage:"公布执行", cross_dept:true,
+    lead_dept:"工业和信息化部", support_depts:["中央网信办", "国家发展改革委", "国家数据局"],
+    actors:[{name:"工业和信息化部", role:"权袋子", action:"出规划/准入/标准"}, {name:"中央网信办", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家发展改革委", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家数据局", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["科技"], primary_tag:"科技",
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7075333.htm", summary:"工业和信息化部 中央网信办 国家发展和改革委 国家数据局关于推动互联网基础资源高质量发展的指导意见 工信部联信管〔2026〕159号 各省、自治区、直辖市通信管理局，各省、自治区、直辖市及计划单列市、...", doc_no:"工信部联信管〔2026〕159号", pub_org:"工业和信息化部 中央网信办 国家发展改革委 国家数据局" },
+  { id:"n6", title:"国务院关于《扩大消费“十五五”规划》的批复", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-13",
+    story_line:"扩大消费\"十五五\"规划", stage:"公布执行", cross_dept:false,
+    lead_dept:"国务院", support_depts:[],
+    actors:[{name:"国务院", role:"权袋子", action:"扩大消费“十五五”规划"}], rules:["扩大消费“十五五”规划"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["财政"], primary_tag:"财政",
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7075217.htm", summary:"国务院关于《扩大消费“十五五”规划》的批复 国函〔2026〕66号 国家发展改革委、商务部： 你们《关于报送〈扩大消费“十五五”规划〉（送审稿）的请示》（发改就业〔2026〕847号）收悉。现批复如下...", doc_no:"国函〔2026〕66号", pub_org:"国务院" },
+  { id:"n7", title:"国务院关于印发《国民健康“十五五”规划》的通知", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-13",
+    story_line:"国民健康\"十五五\"规划", stage:"公布执行", cross_dept:false,
+    lead_dept:"国务院", support_depts:[],
+    actors:[{name:"国务院", role:"权袋子", action:"国民健康“十五五”规划"}], rules:["国民健康“十五五”规划"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["健康"], primary_tag:"健康",
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7075214.htm", summary:"国务院关于印发《国民健康 “十五五”规划》的通知 国发〔2026〕23号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 现将《国民健康“十五五”规划》印发给你们，请认真贯彻执行。 国务院 ...", doc_no:"国发〔2026〕23号", pub_org:"国务院" },
+  { id:"n8", title:"2026世界人工智能大会暨人工智能全球治理高级别会议将于7月17日至20日在上海举行", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-13",
+    story_line:"2026世界人工智能大会暨人工智能全球治理高级别会议将于7月17日至20日在上海举行", stage:"公布执行", cross_dept:false,
+    lead_dept:"", support_depts:[],
+    actors:[], rules:[], money_moved:false, power_moved:false,
+    upstream:[], midstream:[], downstream:[], topic_tags:["科技"], primary_tag:"科技",
+    link:"https://www.gov.cn/yaowen/liebiao/202607/content_7075205.htm", summary:"", doc_no:"", pub_org:"外交部网站" },
+  { id:"n9", title:"中共中央办公厅 国务院办公厅关于完善自然资源资产管理制度体系的意见", source:"中国政府网",
+    issuer_level:"中办/国办", importance:"high", date_signed:null, date_published:"2026-07-13",
+    story_line:"中共中央办公厅 国务院办公厅关于完善自然资源资产管理制度体系的意见", stage:"公布执行", cross_dept:true,
+    lead_dept:"中共中央办公厅", support_depts:["中央办公厅", "国务院办公厅", "国务院"],
+    actors:[{name:"中共中央办公厅", role:"权袋子", action:"出规划/准入/标准"}, {name:"中央办公厅", role:"权袋子", action:"出规划/准入/标准"}, {name:"国务院办公厅", role:"权袋子", action:"出规划/准入/标准"}, {name:"国务院", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["环保"], primary_tag:"环保",
+    link:"https://www.gov.cn/yaowen/liebiao/202607/content_7075233.htm", summary:"", doc_no:"", pub_org:"新华社" },
+  { id:"n10", title:"解读 | 这份规划，为“十五五”国民健康绘就“路线图”", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-13",
+    story_line:"国民健康\"十五五\"规划", stage:"公布执行", cross_dept:false,
+    lead_dept:"", support_depts:[],
+    actors:[], rules:[], money_moved:false, power_moved:false,
+    upstream:[], midstream:[], downstream:[], topic_tags:["健康"], primary_tag:"健康",
+    link:"https://www.gov.cn/zhengce/202607/content_7075288.htm", summary:"", doc_no:"", pub_org:"新华社" },
+  { id:"n11", title:"国家发展改革委、商务部有关负责人就《扩大消费“十五五”规划》答问", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-13",
+    story_line:"扩大消费\"十五五\"规划", stage:"公布执行", cross_dept:true,
+    lead_dept:"国家发展改革委", support_depts:["商务部"],
+    actors:[{name:"国家发展改革委", role:"权袋子", action:"扩大消费“十五五”规划"}, {name:"商务部", role:"权袋子", action:"扩大消费“十五五”规划"}], rules:["扩大消费“十五五”规划"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["财政"], primary_tag:"财政",
+    link:"https://www.gov.cn/zhengce/202607/content_7075286.htm", summary:"", doc_no:"", pub_org:"国家发展改革委网站" },
+  { id:"n12", title:"关于印发《康复辅助器具产业扩能提质三年行动方案（2026-2028年）》的通知", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-13",
+    story_line:"康复辅助器具产业扩能提质三年行动方案（2026-2028年）", stage:"公布执行", cross_dept:false,
+    lead_dept:"民政部", support_depts:[],
+    actors:[{name:"民政部", role:"权袋子", action:"康复辅助器具产业扩能提质三年行动方案（2026-2028年）"}], rules:["康复辅助器具产业扩能提质三年行动方案（2026-2028年）"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["健康"], primary_tag:"健康",
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7075249.htm", summary:"关于印发《康复辅助器具产业扩能提质三年行动方案（2026-2028年）》的通知 民函〔2026〕48号 各省、自治区、直辖市及新疆生产建设兵团民政厅（局）、发展改革委、教育厅（局）、工业和信息化厅（局...", doc_no:"民函〔2026〕48号", pub_org:"民政部等" },
+  { id:"n13", title:"解读 | 国务院常务会议进一步部署防汛抗洪救灾工作", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-11",
+    story_line:"解读 | 国务院常务会议进一步部署防汛抗洪救灾工作", stage:"公布执行", cross_dept:false,
+    lead_dept:"国务院", support_depts:[],
+    actors:[{name:"国务院", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/zhengce/202607/content_7075043.htm", summary:"", doc_no:"", pub_org:"新华社" },
+  { id:"n14", title:"国务院关于《中医药振兴发展“十五五”规划》的批复", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-10",
+    story_line:"中医药振兴发展\"十五五\"规划", stage:"公布执行", cross_dept:false,
+    lead_dept:"国务院", support_depts:[],
+    actors:[{name:"国务院", role:"权袋子", action:"中医药振兴发展“十五五”规划"}], rules:["中医药振兴发展“十五五”规划"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["健康"], primary_tag:"健康",
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074931.htm", summary:"国务院关于《中医药振兴发展 “十五五”规划》的批复 国函〔2026〕71号 国家卫生健康委、国家发展改革委、国家中医药局： 《国家卫生健康委、国家发展改革委关于报送〈中医药振兴发展“十五五”规划（送审...", doc_no:"国函〔2026〕71号", pub_org:"国务院" },
+  { id:"n15", title:"国家能源局关于印发《能源领域节能降碳行动计划（2026—2028年）》的通知", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-10",
+    story_line:"能源领域节能降碳行动计划（2026—2028年）", stage:"公布执行", cross_dept:false,
+    lead_dept:"国家能源局", support_depts:[],
+    actors:[{name:"国家能源局", role:"权袋子", action:"能源领域节能降碳行动计划（2026—2028年）"}], rules:["能源领域节能降碳行动计划（2026—2028年）"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["能源"], primary_tag:"能源",
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074973.htm", summary:"国家能源局关于印发《能源领域节能降碳行动计划（2026—2028年）》的通知 国能发规划〔2026〕45号 各省（自治区、直辖市）能源局、有关省（自治区、直辖市）及新疆生产建设兵团发展改革委，北京市城...", doc_no:"国能发规划〔2026〕45号", pub_org:"国家能源局" },
+  { id:"n16", title:"国家药品监督管理局公告（2026年第47号） 国家药监局关于发布药品试验数据保护实施办法的公告", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-10",
+    story_line:"国家药品监督管理局公告（2026年第47号） 国家药监局关于发布药品试验数据保护实施办法的公告", stage:"公布执行", cross_dept:false,
+    lead_dept:"国家药品监督管理局", support_depts:[],
+    actors:[{name:"国家药品监督管理局", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["健康"], primary_tag:"健康",
+    link:"https://www.gov.cn/gongbao/2026/issue_12846/202607/content_7074807.html", summary:"国家药品监督管理局公告 2026 年 第 47 号 国家药监局关于发布药品试验数据 保护实施办法的公告 为促进药品创新发展，完善药品试验数据保护制度，根据《中华人民共和国药品管理法》、《中华人民共和国...", doc_no:"", pub_org:"国务院" },
+  { id:"n17", title:"中华人民共和国国务院任免人员", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-10",
+    story_line:"中华人民共和国国务院任免人员", stage:"公布执行", cross_dept:false,
+    lead_dept:"国务院", support_depts:[],
+    actors:[], rules:[], money_moved:false, power_moved:false,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/gongbao/2026/issue_12846/202607/content_7074806.html", summary:"中华人民共和国国务院任免人员 2026年5月31日 蔡奇兼任国家行政学院院长，陈希不再担任国家行政学院院长职务。 免去王志勇的国家中医药管理局副局长职务。", doc_no:"", pub_org:"国务院" },
+  { id:"n18", title:"中华人民共和国民政部令（第82号） 社会组织评估管理办法", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-10",
+    story_line:"中华人民共和国民政部令（第82号） 社会组织评估管理办法", stage:"细则落地", cross_dept:false,
+    lead_dept:"民政部", support_depts:[],
+    actors:[{name:"民政部", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/gongbao/2026/issue_12846/202607/content_7074811.html", summary:"社会组织评估管理办法 （2026年1月16日经民政部部务会议审议通过 2026年1月22日民政部令第82号公布 自2026年3月1日起施行） 第一章 总 则 第一条 为了规范社会组织评估工作，健全社...", doc_no:"", pub_org:"国务院" },
+  { id:"n19", title:"国务院办公厅关于进一步完善大中型水库移民后期扶持政策的通知", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-10",
+    story_line:"国务院办公厅关于进一步完善大中型水库移民后期扶持政策的通知", stage:"细则落地", cross_dept:true,
+    lead_dept:"国务院办公厅", support_depts:["国务院"],
+    actors:[{name:"国务院办公厅", role:"权袋子", action:"出规划/准入/标准"}, {name:"国务院", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/gongbao/2026/issue_12846/202607/content_7074812.html", summary:"国务院办公厅关于进一步完善 大中型水库移民后期扶持政策的通知 国办发〔2026〕20号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 根据《国务院关于完善大中型水库移民后期扶持政策的意...", doc_no:"", pub_org:"国务院" },
+  { id:"n20", title:"中华人民共和国应急管理部令（第20号） 安全评价检测检验机构管理办法", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-10",
+    story_line:"中华人民共和国应急管理部令（第20号） 安全评价检测检验机构管理办法", stage:"细则落地", cross_dept:false,
+    lead_dept:"应急管理部", support_depts:[],
+    actors:[{name:"应急管理部", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/gongbao/2026/issue_12846/202607/content_7074810.html", summary:"安全评价检测检验机构管理办法 （2019年3月20日应急管理部令第1号公布 2026年4月7日经应急管理部部务会议修订通过 2026年5月17日应急管理部令第20号公布 自2026年7月1日起施行） ...", doc_no:"", pub_org:"国务院" },
+  { id:"n21", title:"国家铁路局关于印发《铁路交通重大事故隐患判定标准》的通知 铁路交通重大事故隐患判定标准", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-10",
+    story_line:"铁路交通重大事故隐患判定标准", stage:"公布执行", cross_dept:false,
+    lead_dept:"国家铁路局", support_depts:[],
+    actors:[{name:"国家铁路局", role:"权袋子", action:"铁路交通重大事故隐患判定标准"}], rules:["铁路交通重大事故隐患判定标准"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/gongbao/2026/issue_12846/202607/content_7074808.html", summary:"国家铁路局关于印发 《铁路交通重大事故隐患判定标准》的通知 国铁安监规〔2026〕17号 国铁集团、国家能源集团，中国中铁、中国铁建、中国中车、中国通号、中国物流，各地方铁路运输企业，各地区铁路监...", doc_no:"", pub_org:"国务院" },
+  { id:"n22", title:"民政部 国家发展改革委 工业和信息化部 自然资源部 住房城乡建设部 农业农村部 国家 卫生健康委 广电总局 体育总局 中国残联 全国老龄办关于推进互助性养老服务发展的 意见", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-10",
+    story_line:"民政部 国家发展改革委 工业和信息化部 自然资源部 住房城乡建设部 农业农村部 国家 卫生健康委 广电总局 体育总局 中国残联 全国老龄办关于推进互助性养老服务发展的 意见", stage:"公布执行", cross_dept:true,
+    lead_dept:"民政部", support_depts:["国家发展改革委", "工业和信息化部", "自然资源部", "住房城乡建设部", "农业农村部", "体育总局"],
+    actors:[{name:"民政部", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家发展改革委", role:"权袋子", action:"出规划/准入/标准"}, {name:"工业和信息化部", role:"权袋子", action:"出规划/准入/标准"}, {name:"自然资源部", role:"权袋子", action:"出规划/准入/标准"}, {name:"住房城乡建设部", role:"权袋子", action:"出规划/准入/标准"}, {name:"农业农村部", role:"权袋子", action:"出规划/准入/标准"}, {name:"体育总局", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["健康"], primary_tag:"健康",
+    link:"https://www.gov.cn/gongbao/2026/issue_12846/202607/content_7074809.html", summary:"民政部 国家发展改革委 工业和信息化部 自然资源部 住房城乡建设部 农业农村部 国家卫生健康委 广电总局 体育总局 中国残联 全国老龄办关于推进 互助性养老服务发展的意见 民发〔2026〕11号 ...", doc_no:"", pub_org:"国务院" },
+  { id:"n23", title:"中华人民共和国国务院令（第840号） 退役军人就业创业促进条例", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-10",
+    story_line:"中华人民共和国国务院令（第840号） 退役军人就业创业促进条例", stage:"公布执行", cross_dept:false,
+    lead_dept:"国务院", support_depts:[],
+    actors:[{name:"国务院", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/gongbao/2026/issue_12846/202607/content_7074814.html", summary:"中华人民共和国国务院令 第 840 号 《退役军人就业创业促进条例》已经2026年6月5日国务院第88次常务会议通过，现予公布，自2026年8月1日起施行。 总 理 李 强 2026年6月...", doc_no:"", pub_org:"国务院" },
+  { id:"n24", title:"国务院关于印发《教育发展“十五五”规划》的通知 教育发展“十五五”规划", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-10",
+    story_line:"教育发展\"十五五\"规划", stage:"公布执行", cross_dept:false,
+    lead_dept:"国务院", support_depts:[],
+    actors:[{name:"国务院", role:"权袋子", action:"教育发展“十五五”规划"}], rules:["教育发展“十五五”规划"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["教育"], primary_tag:"教育",
+    link:"https://www.gov.cn/gongbao/2026/issue_12846/202607/content_7074813.html", summary:"国务院关于印发《教育发展 “十五五”规划》的通知 国发〔2026〕19号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 现将《教育发展“十五五”规划》印发给你们，请认真贯彻执行。 国 ...", doc_no:"", pub_org:"国务院" },
+  { id:"n25", title:"在庆祝中国共产党成立105周年大会上的讲话 …………………………………………………… 习近平", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-10",
+    story_line:"在庆祝中国共产党成立105周年大会上的讲话 …………………………………………………… 习近平", stage:"公布执行", cross_dept:false,
+    lead_dept:"国务院", support_depts:[],
+    actors:[], rules:[], money_moved:false, power_moved:false,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/gongbao/2026/issue_12846/202607/content_7074815.html", summary:"在庆祝中国共产党成立105周年大会上的讲话 （2026年7月1日） 习近平 同志们，朋友们： 今天，我们隆重集会，庆祝中国共产党成立105周年，回顾我们党走过的光辉历程，展望党和人民事业发展的光明前景...", doc_no:"", pub_org:"国务院" },
+  { id:"n26", title:"国务院关于印发《“十五五”碳达峰行动方案》的通知", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-09",
+    story_line:"\"十五五\"碳达峰行动方案", stage:"公布执行", cross_dept:false,
+    lead_dept:"国务院", support_depts:[],
+    actors:[{name:"国务院", role:"权袋子", action:"“十五五”碳达峰行动方案"}], rules:["“十五五”碳达峰行动方案"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["环保"], primary_tag:"环保",
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074827.htm", summary:"国务院关于印发《“十五五” 碳达峰行动方案》的通知 国发〔2026〕22号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 现将《“十五五”碳达峰行动方案》印发给你们，请认真贯彻执行。 国务...", doc_no:"国发〔2026〕22号", pub_org:"国务院" },
+  { id:"n27", title:"关于印发国家基本药物目录（2026年版）的通知", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-09",
+    story_line:"关于印发国家基本药物目录（2026年版）的通知", stage:"公布执行", cross_dept:true,
+    lead_dept:"国家卫生健康委", support_depts:["国家中医药管理局", "国家疾病预防控制局"],
+    actors:[{name:"国家卫生健康委", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家中医药管理局", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家疾病预防控制局", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["健康"], primary_tag:"健康",
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074868.htm", summary:"关于印发国家基本药物目录（2026年版）的通知 国卫药政发〔2026〕17号 各省、自治区、直辖市及新疆生产建设兵团卫生健康委、中医药局、疾控局： 为贯彻落实党中央、国务院决策部署，巩固完善国家基本药...", doc_no:"国卫药政发〔2026〕17号", pub_org:"国家卫生健康委 国家中医药局 国家疾控局" },
+  { id:"n28", title:"商务部等9部门关于加快零售业创新发展的意见", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-09",
+    story_line:"商务部等9部门关于加快零售业创新发展的意见", stage:"公布执行", cross_dept:true,
+    lead_dept:"商务部", support_depts:["国家发展改革委", "司法部", "财政部", "人力资源社会保障部", "自然资源部", "住房城乡建设部", "文化和旅游部", "国家市场监督管理总局"],
+    actors:[{name:"国家发展改革委", role:"钱袋子", action:"出资金/价格/税"}, {name:"财政部", role:"钱袋子", action:"出资金/价格/税"}, {name:"商务部", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家发展改革委", role:"权袋子", action:"出规划/准入/标准"}, {name:"司法部", role:"权袋子", action:"出规划/准入/标准"}, {name:"人力资源社会保障部", role:"权袋子", action:"出规划/准入/标准"}, {name:"自然资源部", role:"权袋子", action:"出规划/准入/标准"}, {name:"住房城乡建设部", role:"权袋子", action:"出规划/准入/标准"}, {name:"文化和旅游部", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家市场监督管理总局", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:true, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["财政"], primary_tag:"财政",
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074797.htm", summary:"商务部等9部门关于加快零售业创新发展的意见 商流通函〔2026〕306号 国家发展改革委、教育部、公安部、司法部、财政部、人力资源社会保障部、自然资源部、住房城乡建设部、商务部、文化和旅游部、中国人民...", doc_no:"商流通函〔2026〕306号", pub_org:"商务部 国家发展改革委 司法部 财政部 人力资源社会保障部 自然资源部 住房城乡建设部 文化和旅游部 市场监管总局" },
+  { id:"n29", title:"民政部发文加强城乡三级养老服务网络建设管理", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-08",
+    story_line:"民政部发文加强城乡三级养老服务网络建设管理", stage:"公布执行", cross_dept:false,
+    lead_dept:"民政部", support_depts:[],
+    actors:[{name:"民政部", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["健康"], primary_tag:"健康",
+    link:"https://www.gov.cn/lianbo/202607/content_7074658.htm", summary:"", doc_no:"", pub_org:"新华社" },
+  { id:"n30", title:"国务院关于《疾病预防控制“十五五”规划》的批复", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-08",
+    story_line:"疾病预防控制\"十五五\"规划", stage:"公布执行", cross_dept:false,
+    lead_dept:"国务院", support_depts:[],
+    actors:[{name:"国务院", role:"权袋子", action:"疾病预防控制“十五五”规划"}], rules:["疾病预防控制“十五五”规划"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["健康"], primary_tag:"健康",
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074675.htm", summary:"国务院关于《疾病预防控制 “十五五”规划》的批复 国函〔2026〕69号 国家卫生健康委、国家疾控局、国家发展改革委、财政部、农业农村部、海关总署、国家中医药局： 《国家卫生健康委关于报请审定〈疾病预...", doc_no:"国函〔2026〕69号", pub_org:"国务院" },
+  { id:"n31", title:"关于加快推进“人工智能＋人社”应用发展的实施意见", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-08",
+    story_line:"关于加快推进\"人工智能＋人社\"应用发展的实施意见", stage:"公布执行", cross_dept:true,
+    lead_dept:"人力资源社会保障部", support_depts:["国家发展改革委", "工业和信息化部", "国家数据局"],
+    actors:[{name:"人力资源社会保障部", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家发展改革委", role:"权袋子", action:"出规划/准入/标准"}, {name:"工业和信息化部", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家数据局", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["科技"], primary_tag:"科技",
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074732.htm", summary:"人力资源社会保障部 国家发展改革委 工业和信息化部 国家数据局关于加快推进“人工智能＋人社”应用发展的实施意见 人社部发〔2026〕40号 各省、自治区、直辖市及新疆生产建设兵团人力资源社会保障厅（局...", doc_no:"人社部发〔2026〕40号", pub_org:"人力资源社会保障部 国家发展改革委 工业和信息化部 国家数据局" },
+  { id:"n32", title:"民政部关于印发《城乡三级养老服务网络建设管理指引》的通知", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-08",
+    story_line:"城乡三级养老服务网络建设管理指引", stage:"公布执行", cross_dept:false,
+    lead_dept:"民政部", support_depts:[],
+    actors:[{name:"民政部", role:"权袋子", action:"城乡三级养老服务网络建设管理指引"}], rules:["城乡三级养老服务网络建设管理指引"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["健康"], primary_tag:"健康",
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074664.htm", summary:"民政部关于印发《城乡三级养老服务网络建设管理指引》的通知 民函〔2026〕41号 各省、自治区、直辖市民政厅（局），新疆生产建设兵团民政局： 为贯彻落实《中共中央 国务院关于深化养老服务改革发展的意见...", doc_no:"民函〔2026〕41号", pub_org:"民政部" },
+  { id:"n33", title:"文化和旅游部关于印发《旅游强国建设“十五五”规划》的通知", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-08",
+    story_line:"旅游强国建设\"十五五\"规划", stage:"公布执行", cross_dept:false,
+    lead_dept:"文化和旅游部", support_depts:[],
+    actors:[{name:"文化和旅游部", role:"权袋子", action:"旅游强国建设“十五五”规划"}], rules:["旅游强国建设“十五五”规划"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074649.htm", summary:"文化和旅游部关于印发《旅游强国建设“十五五”规划》的通知 文旅资源发〔2026〕42号 各省、自治区、直辖市人民政府，新疆生产建设兵团，国务院各部委、各直属机构： 《旅游强国建设“十五五”规划》已经...", doc_no:"文旅资源发〔2026〕42号", pub_org:"文化和旅游部" },
+  { id:"n34", title:"国务院关于《旅游强国建设“十五五”规划》的批复", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-07",
+    story_line:"旅游强国建设\"十五五\"规划", stage:"公布执行", cross_dept:false,
+    lead_dept:"国务院", support_depts:[],
+    actors:[{name:"国务院", role:"权袋子", action:"旅游强国建设“十五五”规划"}], rules:["旅游强国建设“十五五”规划"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074517.htm", summary:"国务院关于《旅游强国建设 “十五五”规划》的批复 国函〔2026〕61号 文化和旅游部： 你部《关于呈报〈旅游强国建设“十五五”规划（送审稿）〉的请示》（文旅资源报〔2026〕38号）收悉。现批复如下...", doc_no:"国函〔2026〕61号", pub_org:"国务院" },
+  { id:"n35", title:"今年\"两重\"建设项目清单全部下达 共安排8000亿元支持1417个重大项目", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-06",
+    story_line:"今年\"两重\"建设项目清单全部下达 共安排8000亿元支持1417个重大项目", stage:"公布执行", cross_dept:false,
+    lead_dept:"", support_depts:[],
+    actors:[], rules:[], money_moved:false, power_moved:false,
+    upstream:[], midstream:[], downstream:[], topic_tags:["财政"], primary_tag:"财政",
+    link:"https://www.gov.cn/yaowen/liebiao/202607/content_7074439.htm", summary:"", doc_no:"", pub_org:"央视网" },
+  { id:"n36", title:"关于促进电影院多样化经营 繁荣发展电影院文化的通知", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-04",
+    story_line:"关于促进电影院多样化经营 繁荣发展电影院文化的通知", stage:"细则落地", cross_dept:true,
+    lead_dept:"国家电影局", support_depts:["国家市场监督管理总局"],
+    actors:[{name:"国家电影局", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家市场监督管理总局", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074305.htm", summary:"关于促进电影院多样化经营 繁荣发展电影院文化的通知 国影发〔2026〕5号 各省、自治区、直辖市电影主管部门、市场监管局（厅、委）： 为贯彻落实党的二十届四中全会精神，以新需求引领新供给，以新供给创造...", doc_no:"国影发〔2026〕5号", pub_org:"国家电影局 市场监管总局" },
+  { id:"n37", title:"国务院关于印发《美丽中国建设“十五五”规划》的通知", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-03",
+    story_line:"美丽中国建设\"十五五\"规划", stage:"公布执行", cross_dept:false,
+    lead_dept:"国务院", support_depts:[],
+    actors:[{name:"国务院", role:"权袋子", action:"美丽中国建设“十五五”规划"}], rules:["美丽中国建设“十五五”规划"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["环保"], primary_tag:"环保",
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074200.htm", summary:"国务院关于印发《美丽中国建设 “十五五”规划》的通知 国发〔2026〕20号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 现将《美丽中国建设“十五五”规划》印发给你们，请认真贯彻执行。 ...", doc_no:"国发〔2026〕20号", pub_org:"国务院" },
+  { id:"n38", title:"关于调整节能汽车、新能源汽车车船税优惠政策的公告", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-03",
+    story_line:"关于调整节能汽车、新能源汽车车船税优惠政策的公告", stage:"公布执行", cross_dept:true,
+    lead_dept:"财政部", support_depts:["国家税务总局", "工业和信息化部"],
+    actors:[{name:"财政部", role:"钱袋子", action:"出资金/价格/税"}, {name:"国家税务总局", role:"钱袋子", action:"出资金/价格/税"}, {name:"工业和信息化部", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:true, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["汽车", "能源", "财政"], primary_tag:"汽车",
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074231.htm", summary:"关于调整节能汽车、新能源汽车车船税优惠政策的公告 财政部 税务总局 工业和信息化部公告2026年第19号 根据《中华人民共和国车船税法》及其实施条例有关规定，现就调整节能汽车、新能源汽车车船税优惠政...", doc_no:"财政部 税务总局 工业和信息化部公告2026年第19号", pub_org:"财政部 税务总局 工业和信息化部" },
+  { id:"n39", title:"国家发展改革委 国家能源局关于印发《新型能源体系建设“十五五”规划》的通知", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-03",
+    story_line:"新型能源体系建设\"十五五\"规划", stage:"公布执行", cross_dept:true,
+    lead_dept:"国家发展改革委", support_depts:["国家能源局"],
+    actors:[{name:"国家发展改革委", role:"权袋子", action:"新型能源体系建设“十五五”规划"}, {name:"国家能源局", role:"权袋子", action:"新型能源体系建设“十五五”规划"}], rules:["新型能源体系建设“十五五”规划"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["能源"], primary_tag:"能源",
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074220.htm", summary:"国家发展改革委 国家能源局关于印发《新型能源体系建设“十五五”规划》的通知 发改能源〔2026〕884号 各省、自治区、直辖市人民政府，国务院有关部委、直属机构，有关中央企业： 《新型能源体系建设“十...", doc_no:"发改能源〔2026〕884号", pub_org:"国家发展改革委 国家能源局" },
+  { id:"n40", title:"国务院关于《残疾人保障和发展“十五五”规划》的批复", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-02",
+    story_line:"残疾人保障和发展\"十五五\"规划", stage:"公布执行", cross_dept:false,
+    lead_dept:"国务院", support_depts:[],
+    actors:[{name:"国务院", role:"权袋子", action:"残疾人保障和发展“十五五”规划"}], rules:["残疾人保障和发展“十五五”规划"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074096.htm", summary:"国务院关于《残疾人保障和发展 “十五五”规划》的批复 国函〔2026〕60号 国务院残疾人工作委员会： 你委《关于报送〈残疾人保障和发展“十五五”规划（送审稿）〉的请示》（残工委发〔2026〕3号）收...", doc_no:"国函〔2026〕60号", pub_org:"国务院" },
+  { id:"n41", title:"国务院关于《体育强国建设“十五五”规划》的批复", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-02",
+    story_line:"体育强国建设\"十五五\"规划", stage:"公布执行", cross_dept:false,
+    lead_dept:"国务院", support_depts:[],
+    actors:[{name:"国务院", role:"权袋子", action:"体育强国建设“十五五”规划"}], rules:["体育强国建设“十五五”规划"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074093.htm", summary:"国务院关于《体育强国建设 “十五五”规划》的批复 国函〔2026〕59号 体育总局： 你局《关于报请审定〈体育强国建设“十五五”规划（送审稿）〉的请示》（体政字〔2026〕137号）收悉。现批复如下：...", doc_no:"国函〔2026〕59号", pub_org:"国务院" },
+  { id:"n42", title:"国务院关于同意在上海市设立上海辰山国家植物园的批复", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-02",
+    story_line:"国务院关于同意在上海市设立上海辰山国家植物园的批复", stage:"公布执行", cross_dept:false,
+    lead_dept:"国务院", support_depts:[],
+    actors:[{name:"国务院", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074091.htm", summary:"国务院关于同意在上海市 设立上海辰山国家植物园的批复 国函〔2026〕58号 上海市人民政府，自然资源部、住房城乡建设部、中国科学院、国家林草局： 《自然资源部、住房城乡建设部、中国科学院、上海市人民...", doc_no:"国函〔2026〕58号", pub_org:"国务院" },
+  { id:"n43", title:"人力资源社会保障部 教育部 财政部 国家税务总局关于失业保险支持企业稳岗扩岗的通知", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-02",
+    story_line:"人力资源社会保障部 教育部 财政部 国家税务总局关于失业保险支持企业稳岗扩岗的通知", stage:"细则落地", cross_dept:true,
+    lead_dept:"人力资源社会保障部", support_depts:["教育部", "财政部", "国家税务总局"],
+    actors:[{name:"财政部", role:"钱袋子", action:"出资金/价格/税"}, {name:"国家税务总局", role:"钱袋子", action:"出资金/价格/税"}, {name:"人力资源社会保障部", role:"权袋子", action:"出规划/准入/标准"}, {name:"教育部", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:true, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["财政", "教育"], primary_tag:"财政",
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074139.htm", summary:"人力资源社会保障部 教育部 财政部 国家税务总局关于失业保险支持企业稳岗扩岗的通知 人社部发〔2026〕39号 各省、自治区、直辖市人民政府，新疆生产建设兵团： 为贯彻落实党中央、国务院有关决策部署，...", doc_no:"人社部发〔2026〕39号", pub_org:"人力资源社会保障部 教育部 财政部 国家税务总局" },
+  { id:"n44", title:"关于完善现代化都市圈综合交通运输体系的指导意见", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-02",
+    story_line:"关于完善现代化都市圈综合交通运输体系的指导意见", stage:"公布执行", cross_dept:false,
+    lead_dept:"交通运输部", support_depts:[],
+    actors:[{name:"交通运输部", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074075.htm", summary:"交通运输部 国家发展改革委 公安部 财政部 自然资源部 住房城乡建设部 国家铁路局 中国民用航空局 国家邮政局 中国国家铁路集团有限公司关于完善现代化都市圈综合交通运输体系的指导意见 交规划发〔202...", doc_no:"交规划发〔2026〕64号", pub_org:"交通运输部等" },
+  { id:"n45", title:"工业和信息化部等八部门印发《关于推动工业互联网高质量发展的实施意见》的通知", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-01",
+    story_line:"关于推动工业互联网高质量发展的实施意见", stage:"公布执行", cross_dept:true,
+    lead_dept:"工业和信息化部", support_depts:["国家发展改革委", "人力资源社会保障部", "应急管理部", "中国人民银行", "国务院国资委", "国家市场监督管理总局", "中国证监会"],
+    actors:[{name:"工业和信息化部", role:"权袋子", action:"关于推动工业互联网高质量发展的实施意见"}, {name:"国家发展改革委", role:"权袋子", action:"关于推动工业互联网高质量发展的实施意见"}, {name:"人力资源社会保障部", role:"权袋子", action:"关于推动工业互联网高质量发展的实施意见"}, {name:"应急管理部", role:"权袋子", action:"关于推动工业互联网高质量发展的实施意见"}, {name:"中国人民银行", role:"权袋子", action:"关于推动工业互联网高质量发展的实施意见"}, {name:"国家市场监督管理总局", role:"权袋子", action:"关于推动工业互联网高质量发展的实施意见"}, {name:"中国证监会", role:"权袋子", action:"关于推动工业互联网高质量发展的实施意见"}], rules:["关于推动工业互联网高质量发展的实施意见"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["科技"], primary_tag:"科技",
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7073906.htm", summary:"工业和信息化部等八部门印发《关于推动工业互联网高质量发展的实施意见》的通知 工信部联信管〔2026〕152号 各省、自治区、直辖市及计划单列市、新疆生产建设兵团工业和信息化、发展改革委、人力资源社会保...", doc_no:"工信部联信管〔2026〕152号", pub_org:"工业和信息化部 国家发展改革委 人力资源社会保障部 应急管理部 中国人民银行 国务院国资委 市场监管总局 中国证监会" },
+  { id:"n46", title:"退役军人就业创业促进条例", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-30",
+    story_line:"退役军人就业创业促进条例", stage:"公布执行", cross_dept:false,
+    lead_dept:"国务院", support_depts:[],
+    actors:[{name:"国务院", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7073789.htm", summary:"中华人民共和国国务院令 第840号 《退役军人就业创业促进条例》已经2026年6月5日国务院第88次常务会议通过，现予公布，自2026年8月1日起施行。 总理 李强 2026年6月...", doc_no:"国令第840号", pub_org:"国务院" },
+  { id:"n47", title:"国务院关于浙江、福建、山东等3省国家级自然保护区和国家级风景名胜区整合优化方案的批复", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-30",
+    story_line:"国务院关于浙江、福建、山东等3省国家级自然保护区和国家级风景名胜区整合优化方案的批复", stage:"公布执行", cross_dept:false,
+    lead_dept:"国务院", support_depts:[],
+    actors:[{name:"国务院", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["环保"], primary_tag:"环保",
+    link:"https://www.gov.cn/gongbao/2026/issue_12826/202606/content_7073636.html", summary:"国务院关于浙江、福建、山东等3省 国家级自然保护区和国家级风景名胜区 整合优化方案的批复 国函〔2026〕53号 自然资源部、生态环境部、国家林草局： 《自然资源部、生态环境部关于报请批准浙江、福...", doc_no:"", pub_org:"国务院" },
+  { id:"n48", title:"国家药品监督管理局 中华人民共和国公安部 中华人民共和国国家卫生健康委员会 国家市 场监督管理总局 国家医疗保障局 国家中医药管理局 国家疾病预防控制局公告（2026年 第42号） 国家药监局 公安部 国家卫生健康委 市场监管总局 国家医保局 国家中医药局 国家 疾控局关于发布《医药代表管理办法》的公告", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-30",
+    story_line:"医药代表管理办法", stage:"公布执行", cross_dept:true,
+    lead_dept:"国家药品监督管理局", support_depts:["公安部", "国家卫生健康委", "国家医疗保障局", "国家中医药管理局", "国家疾病预防控制局", "国家市场监督管理总局"],
+    actors:[{name:"国家药品监督管理局", role:"权袋子", action:"医药代表管理办法"}, {name:"公安部", role:"权袋子", action:"医药代表管理办法"}, {name:"国家卫生健康委", role:"权袋子", action:"医药代表管理办法"}, {name:"国家中医药管理局", role:"权袋子", action:"医药代表管理办法"}, {name:"国家疾病预防控制局", role:"权袋子", action:"医药代表管理办法"}, {name:"国家市场监督管理总局", role:"权袋子", action:"医药代表管理办法"}], rules:["医药代表管理办法"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["健康"], primary_tag:"健康",
+    link:"https://www.gov.cn/gongbao/2026/issue_12826/202606/content_7073631.html", summary:"2026 年 第 42 号 国家药监局 公安部 国家卫生健康委 市场监管总局 国家医保局 国家中医药局 国家疾控局关于发布《医药代表管理办法》的公告 为规范医药代表学术推广行为，进一步加强医药代表管理...", doc_no:"", pub_org:"国务院" },
+  { id:"n49", title:"人力资源社会保障部 国家发展改革委 工业和信息化部 农业农村部关于实施创业模式引领 行动的通知", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-30",
+    story_line:"人力资源社会保障部 国家发展改革委 工业和信息化部 农业农村部关于实施创业模式引领 行动的通知", stage:"细则落地", cross_dept:true,
+    lead_dept:"人力资源社会保障部", support_depts:["国家发展改革委", "工业和信息化部", "农业农村部"],
+    actors:[{name:"人力资源社会保障部", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家发展改革委", role:"权袋子", action:"出规划/准入/标准"}, {name:"工业和信息化部", role:"权袋子", action:"出规划/准入/标准"}, {name:"农业农村部", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/gongbao/2026/issue_12826/202606/content_7073632.html", summary:"人力资源社会保障部 国家发展改革委 工业和信息化部 农业农村部关于实施创业模式引领行动的通知 人社部发〔2026〕30号 各省、自治区、直辖市及新疆生产建设兵团人力资源社会保障厅（局）、发展改革委...", doc_no:"", pub_org:"国务院" },
+  { id:"n50", title:"国家互联网信息办公室 中华人民共和国工业和信息化部 中华人民共和国公安部 中华人民 共和国交通运输部 中华人民共和国商务部 中国人民银行 中华人民共和国海关总署 国家 税务总局 国家市场监督管理总局 国家金融监督管理总局令（第22号） 促进和规范电子单证应用规定", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-30",
+    story_line:"国家互联网信息办公室 中华人民共和国工业和信息化部 中华人民共和国公安部 中华人民 共和国交通运输部 中华人民共和国商务部 中国人民银行 中华人民共和国海关总署 国家 税务总局 国家市场监督管理总局 国家金融监督管理总局令（第22号） 促进和规范电子单证应用规定", stage:"细则落地", cross_dept:true,
+    lead_dept:"国家互联网信息办公室", support_depts:["工业和信息化部", "公安部", "交通运输部", "商务部", "中国人民银行", "海关总署", "国家税务总局", "国家市场监督管理总局", "国家金融监督管理总局"],
+    actors:[{name:"中国人民银行", role:"钱袋子", action:"出资金/价格/税"}, {name:"国家税务总局", role:"钱袋子", action:"出资金/价格/税"}, {name:"国家金融监督管理总局", role:"钱袋子", action:"出资金/价格/税"}, {name:"国家互联网信息办公室", role:"权袋子", action:"出规划/准入/标准"}, {name:"工业和信息化部", role:"权袋子", action:"出规划/准入/标准"}, {name:"公安部", role:"权袋子", action:"出规划/准入/标准"}, {name:"交通运输部", role:"权袋子", action:"出规划/准入/标准"}, {name:"商务部", role:"权袋子", action:"出规划/准入/标准"}, {name:"中国人民银行", role:"权袋子", action:"出规划/准入/标准"}, {name:"海关总署", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家市场监督管理总局", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家金融监督管理总局", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:true, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["科技", "财政"], primary_tag:"科技",
+    link:"https://www.gov.cn/gongbao/2026/issue_12826/202606/content_7073633.html", summary:"促进和规范电子单证应用规定 （2026年2月10日经国家网信办室务会会议审议通过，并经工业和信息化部、公安部、交通运输部、商务部、中国人民银行、海关总署、税务总局、市场监管总局、金融监管总局同意 20...", doc_no:"", pub_org:"国务院" },
+  { id:"n51", title:"国务院关于印发《实施就业优先战略“十五五”规划》的通知 实施就业优先战略“十五五”规划", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-30",
+    story_line:"实施就业优先战略\"十五五\"规划", stage:"公布执行", cross_dept:false,
+    lead_dept:"国务院", support_depts:[],
+    actors:[{name:"国务院", role:"权袋子", action:"实施就业优先战略“十五五”规划"}], rules:["实施就业优先战略“十五五”规划"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/gongbao/2026/issue_12826/202606/content_7073637.html", summary:"国务院关于印发《实施就业优先战略 “十五五”规划》的通知 国发〔2026〕16号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 现将《实施就业优先战略“十五五”规划》印发给你们，请认真...", doc_no:"", pub_org:"国务院" },
+  { id:"n52", title:"在第十七届夏季达沃斯论坛开幕式上的致辞 ………………………… 中华人民共和国国务院总理 李强", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-30",
+    story_line:"在第十七届夏季达沃斯论坛开幕式上的致辞 ………………………… 中华人民共和国国务院总理 李强", stage:"公布执行", cross_dept:false,
+    lead_dept:"国务院", support_depts:[],
+    actors:[], rules:[], money_moved:false, power_moved:false,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/gongbao/2026/issue_12826/202606/content_7073638.html", summary:"在第十七届夏季达沃斯论坛开幕式上的致辞 （2026年6月24日，大连） 中华人民共和国国务院总理 李 强 尊敬的霍夫曼共同主席、茨温吉总裁， 尊敬的各国领导人， 尊敬的各位国际组织负责人， 尊敬的各位...", doc_no:"", pub_org:"国务院" },
+  { id:"n53", title:"中国证券监督管理委员会令（第234号） 衍生品交易监督管理办法（试行）", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-30",
+    story_line:"中国证券监督管理委员会令（第234号） 衍生品交易监督管理办法（试行）", stage:"细则落地", cross_dept:false,
+    lead_dept:"国务院", support_depts:[],
+    actors:[{name:"国务院", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["财政"], primary_tag:"财政",
+    link:"https://www.gov.cn/gongbao/2026/issue_12826/202606/content_7073634.html", summary:"衍生品交易监督管理办法（试行） （2026年5月13日经中国证监会委务会议审议通过 2026年5月14日中国证监会令第234号公布 自2026年11月16日起施行） 第一章 总 则 第一条 为了规范...", doc_no:"", pub_org:"国务院" },
+  { id:"n54", title:"中华人民共和国交通运输部令（2026年第10号） 公共航空运输企业经营许可规定", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-30",
+    story_line:"中华人民共和国交通运输部令（2026年第10号） 公共航空运输企业经营许可规定", stage:"细则落地", cross_dept:false,
+    lead_dept:"交通运输部", support_depts:[],
+    actors:[{name:"交通运输部", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/gongbao/2026/issue_12826/202606/content_7073635.html", summary:"公共航空运输企业经营许可规定 （2026年5月22日经交通运输部部务会议通过 2026年5月27日交通运输部令2026年第10号公布 自2026年7月1日起施行） 第一章 总 则 第一条 为了实施公...", doc_no:"", pub_org:"国务院" },
+  { id:"n55", title:"国务院关于印发《教育发展“十五五”规划》的通知", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-29",
+    story_line:"教育发展\"十五五\"规划", stage:"公布执行", cross_dept:false,
+    lead_dept:"国务院", support_depts:[],
+    actors:[{name:"国务院", role:"权袋子", action:"教育发展“十五五”规划"}], rules:["教育发展“十五五”规划"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["教育"], primary_tag:"教育",
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7073641.htm", summary:"国务院关于印发《教育发展 “十五五”规划》的通知 国发〔2026〕19号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 现将《教育发展“十五五”规划》印发给你们，请认真贯彻执行。 国务院 ...", doc_no:"国发〔2026〕19号", pub_org:"国务院" },
+  { id:"n56", title:"民政部 人力资源社会保障部关于印发《养老服务师职业资格制度暂行规定》的通知", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-06-26",
+    story_line:"养老服务师职业资格制度暂行规定", stage:"公布执行", cross_dept:true,
+    lead_dept:"民政部", support_depts:["人力资源社会保障部"],
+    actors:[{name:"民政部", role:"权袋子", action:"养老服务师职业资格制度暂行规定"}, {name:"人力资源社会保障部", role:"权袋子", action:"养老服务师职业资格制度暂行规定"}], rules:["养老服务师职业资格制度暂行规定"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["健康"], primary_tag:"健康",
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7073378.htm", summary:"民政部 人力资源社会保障部关于印发《养老服务师职业资格制度暂行规定》的通知 民发〔2026〕25号 各省、自治区、直辖市民政厅（局）、人力资源社会保障厅（局），新疆生产建设兵团民政局、人力资源社会保障...", doc_no:"民发〔2026〕25号", pub_org:"民政部 人力资源社会保障部" },
+  { id:"n57", title:"国务院办公厅关于进一步完善大中型水库移民后期扶持政策的通知", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-25",
+    story_line:"国务院办公厅关于进一步完善大中型水库移民后期扶持政策的通知", stage:"细则落地", cross_dept:false,
+    lead_dept:"国务院办公厅", support_depts:[],
+    actors:[{name:"国务院办公厅", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7073260.htm", summary:"国务院办公厅关于进一步完善 大中型水库移民后期扶持政策的通知 国办发〔2026〕20号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 根据《国务院关于完善大中型水库移民后期扶持政策的意见》...", doc_no:"国办发〔2026〕20号", pub_org:"国务院办公厅" },
+  { id:"n58", title:"关于印发《新型能源体系建设“十五五”规划》的通知", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-06-25",
+    story_line:"新型能源体系建设\"十五五\"规划", stage:"公布执行", cross_dept:true,
+    lead_dept:"国家发展改革委", support_depts:["国家能源局"],
+    actors:[{name:"国家发展改革委", role:"权袋子", action:"新型能源体系建设“十五五”规划"}, {name:"国家能源局", role:"权袋子", action:"新型能源体系建设“十五五”规划"}], rules:["新型能源体系建设“十五五”规划"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["能源"], primary_tag:"能源",
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7073322.htm", summary:"国家发展改革委 国家能源局关于印发《新型能源体系建设“十五五”规划》的通知 发改能源〔2026〕884号 各省、自治区、直辖市人民政府，国务院有关部委、直属机构，有关中央企业： 《新型能源体系建设“十...", doc_no:"发改能源〔2026〕884号", pub_org:"国家发展改革委 国家能源局" },
+  { id:"n59", title:"关于印发《美丽中国建设全民行动促进计划（2026-2030年）》的通知", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-06-25",
+    story_line:"美丽中国建设全民行动促进计划（2026-2030年）", stage:"公布执行", cross_dept:true,
+    lead_dept:"生态环境部", support_depts:["中央宣传部", "中央社会工作部", "教育部", "共青团中央", "全国妇联"],
+    actors:[{name:"生态环境部", role:"权袋子", action:"美丽中国建设全民行动促进计划（2026-2030年）"}, {name:"中央宣传部", role:"权袋子", action:"美丽中国建设全民行动促进计划（2026-2030年）"}, {name:"中央社会工作部", role:"权袋子", action:"美丽中国建设全民行动促进计划（2026-2030年）"}, {name:"教育部", role:"权袋子", action:"美丽中国建设全民行动促进计划（2026-2030年）"}], rules:["美丽中国建设全民行动促进计划（2026-2030年）"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["环保"], primary_tag:"环保",
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7073286.htm", summary:"关于印发《美丽中国建设全民行动促进计划（2026-2030年）》的通知 环宣教〔2026〕35号 各省、自治区、直辖市及新疆生产建设兵团生态环境厅（局）、党委宣传部、党委社会工作部、教育厅（教委、教育...", doc_no:"环宣教〔2026〕35号", pub_org:"生态环境部 中央宣传部 中央社会工作部 教育部 共青团中央 全国妇联" },
+  { id:"n60", title:"商务部等8部门办公厅关于公布汽车流通消费改革试点城市名单的通知", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-06-23",
+    story_line:"商务部等8部门办公厅关于公布汽车流通消费改革试点城市名单的通知", stage:"公布执行", cross_dept:true,
+    lead_dept:"商务部", support_depts:["国家发展改革委", "工业和信息化部", "公安部", "交通运输部", "文化和旅游部", "海关总署", "体育总局"],
+    actors:[{name:"商务部", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家发展改革委", role:"权袋子", action:"出规划/准入/标准"}, {name:"工业和信息化部", role:"权袋子", action:"出规划/准入/标准"}, {name:"公安部", role:"权袋子", action:"出规划/准入/标准"}, {name:"交通运输部", role:"权袋子", action:"出规划/准入/标准"}, {name:"文化和旅游部", role:"权袋子", action:"出规划/准入/标准"}, {name:"海关总署", role:"权袋子", action:"出规划/准入/标准"}, {name:"体育总局", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["汽车", "财政"], primary_tag:"汽车",
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7073062.htm", summary:"商务部等8部门办公厅关于公布汽车流通消费改革试点城市名单的通知 商办消费函2026年第345号 为深入贯彻落实党中央、国务院决策部署，加快清理汽车流通消费不合理限制，全链条扩大汽车消费，按照《商务部等...", doc_no:"商办消费函2026年第345号", pub_org:"商务部办公厅 国家发展改革委办公厅 工业和信息化部办公厅 公安部办公厅 交通运输部办公厅 文化和旅游部办公厅 海关总署办公厅 体育总局办公厅" },
+  { id:"n61", title:"商务部等9部门关于培育壮大汽车后市场消费若干措施的通知", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-06-23",
+    story_line:"商务部等9部门关于培育壮大汽车后市场消费若干措施的通知", stage:"细则落地", cross_dept:true,
+    lead_dept:"商务部", support_depts:["工业和信息化部", "公安部", "交通运输部", "文化和旅游部", "海关总署", "国家市场监督管理总局", "国家金融监督管理总局", "体育总局"],
+    actors:[{name:"商务部", role:"权袋子", action:"出规划/准入/标准"}, {name:"工业和信息化部", role:"权袋子", action:"出规划/准入/标准"}, {name:"公安部", role:"权袋子", action:"出规划/准入/标准"}, {name:"交通运输部", role:"权袋子", action:"出规划/准入/标准"}, {name:"文化和旅游部", role:"权袋子", action:"出规划/准入/标准"}, {name:"海关总署", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家市场监督管理总局", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家金融监督管理总局", role:"权袋子", action:"出规划/准入/标准"}, {name:"体育总局", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["汽车", "财政"], primary_tag:"汽车",
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7073060.htm", summary:"商务部等9部门关于培育壮大汽车后市场消费若干措施的通知 商消费函2026年第145号 为贯彻落实国务院办公厅《加快培育服务消费新增长点工作方案》部署要求，破除汽车后市场领域不合理限制措施，培育新业态，...", doc_no:"商消费函2026年第145号", pub_org:"商务部 工业和信息化部 公安部 交通运输部 文化和旅游部 海关总署 市场监管总局 金融监管总局 体育总局" },
+  { id:"n62", title:"商务部 国家发展改革委 财政部关于印发《利用外资固稳促优行动方案》的通知", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-06-22",
+    story_line:"利用外资固稳促优行动方案", stage:"公布执行", cross_dept:true,
+    lead_dept:"商务部", support_depts:["国家发展改革委", "财政部"],
+    actors:[{name:"国家发展改革委", role:"钱袋子", action:"利用外资固稳促优行动方案"}, {name:"财政部", role:"钱袋子", action:"利用外资固稳促优行动方案"}, {name:"商务部", role:"权袋子", action:"利用外资固稳促优行动方案"}, {name:"国家发展改革委", role:"权袋子", action:"利用外资固稳促优行动方案"}], rules:["利用外资固稳促优行动方案"], money_moved:true, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["财政"], primary_tag:"财政",
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7072838.htm", summary:"商务部 国家发展改革委 财政部关于印发《利用外资固稳促优行动方案》的通知 商资发〔2026〕97号 各省、自治区、直辖市人民政府，新疆生产建设兵团，国务院有关部门： 经国务院同意，现将《利用外资固稳促...", doc_no:"商资发〔2026〕97号", pub_org:"商务部 国家发展改革委 财政部" },
+  { id:"n63", title:"国务院关于印发《加快农业农村现代化“十五五”规划》的通知 加快农业农村现代化“十五五”规划", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-20",
+    story_line:"加快农业农村现代化\"十五五\"规划", stage:"公布执行", cross_dept:false,
+    lead_dept:"国务院", support_depts:[],
+    actors:[{name:"国务院", role:"权袋子", action:"加快农业农村现代化“十五五”规划"}], rules:["加快农业农村现代化“十五五”规划"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072477.html", summary:"国务院关于印发《加快农业农村现代化 “十五五”规划》的通知 国发〔2026〕14号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 现将《加快农业农村现代化“十五五”规划》印发给你们，请...", doc_no:"", pub_org:"国务院" },
+  { id:"n64", title:"中国人民银行 中华人民共和国工业和信息化部 国家市场监督管理总局 国家金融监督管理 总局 中国证券监督管理委员会 国家知识产权局 国家互联网信息办公室 国家外汇管理局 公告(〔2026〕第9号) 金融产品网络营销管理办法", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-20",
+    story_line:"中国人民银行 中华人民共和国工业和信息化部 国家市场监督管理总局 国家金融监督管理 总局 中国证券监督管理委员会 国家知识产权局 国家互联网信息办公室 国家外汇管理局 公告(〔2026〕第9号) 金融产品网络营销管理办法", stage:"细则落地", cross_dept:true,
+    lead_dept:"中国人民银行", support_depts:["工业和信息化部", "国家市场监督管理总局", "国家知识产权局", "国家互联网信息办公室", "国家外汇管理局"],
+    actors:[{name:"中国人民银行", role:"钱袋子", action:"出资金/价格/税"}, {name:"国家外汇管理局", role:"钱袋子", action:"出资金/价格/税"}, {name:"中国人民银行", role:"权袋子", action:"出规划/准入/标准"}, {name:"工业和信息化部", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家市场监督管理总局", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家知识产权局", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家互联网信息办公室", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:true, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["财政", "科技"], primary_tag:"财政",
+    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072469.html", summary:"公 告 〔2026〕第 9 号 为规范金融产品网络营销活动，保障金融消费者和投资者合法权益，促进互联网金融业务健康有序发展，中国人民银行、工业和信息化部、市场监管总局、金融监管总局、中国证监会、国家...", doc_no:"", pub_org:"国务院" },
+  { id:"n65", title:"国务院办公厅关于加强监管防范风险促进私募投资基金高质量发展的指导意见", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-20",
+    story_line:"国务院办公厅关于加强监管防范风险促进私募投资基金高质量发展的指导意见", stage:"公布执行", cross_dept:true,
+    lead_dept:"国务院办公厅", support_depts:["国务院"],
+    actors:[{name:"国务院办公厅", role:"权袋子", action:"出规划/准入/标准"}, {name:"国务院", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["财政"], primary_tag:"财政",
+    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072475.html", summary:"国务院办公厅关于加强监管防范风险 促进私募投资基金高质量发展的指导意见 国办函〔2026〕54号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 为做好私募投资基金（以下简称私募基金）加...", doc_no:"", pub_org:"国务院" },
+  { id:"n66", title:"中国人民银行令（〔2026〕第4号） 中国人民银行关于修改部分规章的决定", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-20",
+    story_line:"中国人民银行令（〔2026〕第4号） 中国人民银行关于修改部分规章的决定", stage:"公布执行", cross_dept:false,
+    lead_dept:"中国人民银行", support_depts:[],
+    actors:[{name:"中国人民银行", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["财政"], primary_tag:"财政",
+    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072474.html", summary:"中国人民银行关于修改部分规章的决定 （经中国人民银行行务会议审议通过 2026年5月15日中国人民银行令〔2026〕第4号公布 自2026年7月1日起实施） 为加强金融法治建设，根据市场发展实际完善银...", doc_no:"", pub_org:"国务院" },
+  { id:"n67", title:"国务院关于印发《现代化应急体系建设“十五五”规划》的通知 现代化应急体系建设“十五五”规划", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-20",
+    story_line:"现代化应急体系建设\"十五五\"规划", stage:"公布执行", cross_dept:false,
+    lead_dept:"国务院", support_depts:[],
+    actors:[{name:"国务院", role:"权袋子", action:"现代化应急体系建设“十五五”规划"}], rules:["现代化应急体系建设“十五五”规划"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072476.html", summary:"国务院关于印发《现代化应急体系建设 “十五五”规划》的通知 国发〔2026〕15号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 现将《现代化应急体系建设“十五五”规划》印发给你们，请...", doc_no:"", pub_org:"国务院" },
+  { id:"n68", title:"水利部 国家发展改革委 财政部 生态环境部 农业农村部 国家疾控局关于进一步加强农村 供水工程运行管护工作的通知", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-20",
+    story_line:"水利部 国家发展改革委 财政部 生态环境部 农业农村部 国家疾控局关于进一步加强农村 供水工程运行管护工作的通知", stage:"细则落地", cross_dept:true,
+    lead_dept:"水利部", support_depts:["国家发展改革委", "财政部", "生态环境部", "农业农村部", "国家疾病预防控制局"],
+    actors:[{name:"国家发展改革委", role:"钱袋子", action:"出资金/价格/税"}, {name:"财政部", role:"钱袋子", action:"出资金/价格/税"}, {name:"水利部", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家发展改革委", role:"权袋子", action:"出规划/准入/标准"}, {name:"生态环境部", role:"权袋子", action:"出规划/准入/标准"}, {name:"农业农村部", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家疾病预防控制局", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:true, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["环保", "财政"], primary_tag:"环保",
+    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072470.html", summary:"水利部 国家发展改革委 财政部 生态环境部 农业农村部 国家疾控局关于进一步加强 农村供水工程运行管护工作的通知 水农〔2026〕47号 各省、自治区、直辖市和新疆生产建设兵团水利（水务）厅（局）...", doc_no:"", pub_org:"国务院" },
+  { id:"n69", title:"国家互联网信息办公室 中华人民共和国国家发展和改革委员会 中华人民共和国工业和 信息化部 中华人民共和国公安部 国家市场监督管理总局令（第21号） 人工智能拟人化互动服务管理暂行办法", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-20",
+    story_line:"国家互联网信息办公室 中华人民共和国国家发展和改革委员会 中华人民共和国工业和 信息化部 中华人民共和国公安部 国家市场监督管理总局令（第21号） 人工智能拟人化互动服务管理暂行办法", stage:"细则落地", cross_dept:true,
+    lead_dept:"国家互联网信息办公室", support_depts:["国家发展改革委", "公安部", "国家市场监督管理总局"],
+    actors:[{name:"国家互联网信息办公室", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家发展改革委", role:"权袋子", action:"出规划/准入/标准"}, {name:"公安部", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家市场监督管理总局", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["科技"], primary_tag:"科技",
+    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072472.html", summary:"人工智能拟人化互动服务管理暂行办法 （2026年2月2日经国家网信办室务会会议审议通过，并经国家发展改革委、工业和信息化部、公安部、市场监管总局同意 2026年4月10日国家网信办、国家发展改革委、工...", doc_no:"", pub_org:"国务院" },
+  { id:"n70", title:"国家金融监督管理总局 中国人民银行公告（金规〔2026〕2 号） 个人贷款业务明示综合融资成本规定", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-20",
+    story_line:"国家金融监督管理总局 中国人民银行公告（金规〔2026〕2 号） 个人贷款业务明示综合融资成本规定", stage:"细则落地", cross_dept:true,
+    lead_dept:"国家金融监督管理总局", support_depts:["中国人民银行"],
+    actors:[{name:"国家金融监督管理总局", role:"钱袋子", action:"出资金/价格/税"}, {name:"中国人民银行", role:"钱袋子", action:"出资金/价格/税"}, {name:"国家金融监督管理总局", role:"权袋子", action:"出规划/准入/标准"}, {name:"中国人民银行", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:true, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["财政"], primary_tag:"财政",
+    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072468.html", summary:"公 告 金 规〔2026〕 2 号 为维护个人贷款市场秩序，保护金融消费者合法权益，提升金融服务质效，国家金融监督管理总局会同中国人民银行制定了《个人贷款业务明示综合融资成本规定》，现予发布。 金融...", doc_no:"", pub_org:"国务院" },
+  { id:"n71", title:"中华人民共和国国务院任免人员", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-20",
+    story_line:"中华人民共和国国务院任免人员", stage:"公布执行", cross_dept:false,
+    lead_dept:"国务院", support_depts:[],
+    actors:[], rules:[], money_moved:false, power_moved:false,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072467.html", summary:"中华人民共和国国务院任免人员 2026年5月28日 任命刘苏社为文化和旅游部副部长，免去其国家发展和改革委员会副主任职务。 任命洪宗明为退役军人事务部副部长，免去马飞雄的退役军人事务部副部长职务。 任...", doc_no:"", pub_org:"国务院" },
+  { id:"n72", title:"国家保密局令（2026年第1号） 国家秘密鉴定工作规定", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-20",
+    story_line:"国家保密局令（2026年第1号） 国家秘密鉴定工作规定", stage:"细则落地", cross_dept:false,
+    lead_dept:"国务院", support_depts:[],
+    actors:[{name:"国务院", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072471.html", summary:"国家秘密鉴定工作规定 （2021年7月30日国家保密局令2021年第1号公布 2026年4月4日国家保密局令2026年第1号修订 自2026年6月1日起施行） 第一章 总 则 第一条 为了规范国家秘...", doc_no:"", pub_org:"国务院" },
+  { id:"n73", title:"习近平在朝鲜媒体发表署名文章 继往开来、砥砺同行 续写中朝传统友谊崭新篇章", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-20",
+    story_line:"习近平在朝鲜媒体发表署名文章 继往开来、砥砺同行 续写中朝传统友谊崭新篇章", stage:"公布执行", cross_dept:false,
+    lead_dept:"国务院", support_depts:[],
+    actors:[], rules:[], money_moved:false, power_moved:false,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072478.html", summary:"习近平在朝鲜媒体发表署名文章 继往开来、砥砺同行 续写中朝传统友谊崭新篇章 6月8日，在赴平壤对朝鲜民主主义人民共和国进行国事访问之际，中共中央总书记、国家主席习近平在朝鲜《劳动新闻》发表题为《继往开...", doc_no:"", pub_org:"国务院" },
+  { id:"n74", title:"国家宗教事务局令（第24号） 藏传佛教学衔授予办法", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-20",
+    story_line:"国家宗教事务局令（第24号） 藏传佛教学衔授予办法", stage:"细则落地", cross_dept:false,
+    lead_dept:"国务院", support_depts:[],
+    actors:[{name:"国务院", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072473.html", summary:"藏传佛教学衔授予办法 （2026年3月30日经国家宗教局按规定程序审议通过 2026年4月10日国家宗教局令第24号公布 自2026年5月10日起施行） 第一章 总 则 第一条 为规范藏传佛教学衔授...", doc_no:"", pub_org:"国务院" },
+  { id:"n75", title:"工业和信息化部等七部门关于印发《促进平台经济大中小企业协同发展行动方案（2026—2028年）》的通知", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-06-18",
+    story_line:"促进平台经济大中小企业协同发展行动方案（2026—2028年）", stage:"公布执行", cross_dept:true,
+    lead_dept:"工业和信息化部", support_depts:["中央网信办", "国家发展改革委", "科技部", "商务部", "国家市场监督管理总局", "国家数据局"],
+    actors:[{name:"工业和信息化部", role:"权袋子", action:"促进平台经济大中小企业协同发展行动方案（2026—2028年）"}, {name:"中央网信办", role:"权袋子", action:"促进平台经济大中小企业协同发展行动方案（2026—2028年）"}, {name:"国家发展改革委", role:"权袋子", action:"促进平台经济大中小企业协同发展行动方案（2026—2028年）"}, {name:"科技部", role:"权袋子", action:"促进平台经济大中小企业协同发展行动方案（2026—2028年）"}, {name:"商务部", role:"权袋子", action:"促进平台经济大中小企业协同发展行动方案（2026—2028年）"}, {name:"国家市场监督管理总局", role:"权袋子", action:"促进平台经济大中小企业协同发展行动方案（2026—2028年）"}, {name:"国家数据局", role:"权袋子", action:"促进平台经济大中小企业协同发展行动方案（2026—2028年）"}], rules:["促进平台经济大中小企业协同发展行动方案（2026—2028年）"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["科技"], primary_tag:"科技",
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7072741.htm", summary:"工业和信息化部等七部门关于印发《促进平台经济大中小企业协同发展行动方案（2026—2028年）》的通知 工信部联信管〔2026〕119号 各省，自治区，直辖市通信管理局，各省，自治区，直辖市及计划单列...", doc_no:"工信部联信管〔2026〕119号", pub_org:"工业和信息化部 中央网信办 国家发展改革委 科技部 商务部 市场监管总局 国家数据局" },
+  { id:"n76", title:"商务部等8部门关于加快“人工智能+消费”发展的实施意见", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-06-18",
+    story_line:"商务部等8部门关于加快\"人工智能+消费\"发展的实施意见", stage:"公布执行", cross_dept:true,
+    lead_dept:"商务部", support_depts:["中央网信办", "国家发展改革委", "教育部", "工业和信息化部", "民政部", "住房城乡建设部", "文化和旅游部"],
+    actors:[{name:"国家发展改革委", role:"钱袋子", action:"出资金/价格/税"}, {name:"商务部", role:"权袋子", action:"出规划/准入/标准"}, {name:"中央网信办", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家发展改革委", role:"权袋子", action:"出规划/准入/标准"}, {name:"教育部", role:"权袋子", action:"出规划/准入/标准"}, {name:"工业和信息化部", role:"权袋子", action:"出规划/准入/标准"}, {name:"民政部", role:"权袋子", action:"出规划/准入/标准"}, {name:"住房城乡建设部", role:"权袋子", action:"出规划/准入/标准"}, {name:"文化和旅游部", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:true, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["科技", "财政"], primary_tag:"科技",
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7072672.htm", summary:"商务部等8部门关于加快“人工智能+消费”发展的实施意见 商建发2026年第89号 为贯彻落实《国务院关于深入实施“人工智能+”行动的意见》和《中共中央办公厅 国务院办公厅关于印发〈提振消费专项行动方案...", doc_no:"商建发2026年第89号", pub_org:"商务部 中央网信办 国家发展改革委 教育部 工业和信息化部 民政部 住房城乡建设部 文化和旅游部" },
+  { id:"n77", title:"国务院关于浙江、福建、山东等3省国家级自然保护区和国家级风景名胜区整合优化方案的批复", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-17",
+    story_line:"国务院关于浙江、福建、山东等3省国家级自然保护区和国家级风景名胜区整合优化方案的批复", stage:"公布执行", cross_dept:false,
+    lead_dept:"国务院", support_depts:[],
+    actors:[{name:"国务院", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["环保"], primary_tag:"环保",
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7072484.htm", summary:"国务院关于浙江、福建、山东等3省 国家级自然保护区和国家级风景名胜区 整合优化方案的批复 国函〔2026〕53号 自然资源部、生态环境部、国家林草局： 《自然资源部、生态环境部关于报请批准浙江、福建、...", doc_no:"国函〔2026〕53号", pub_org:"国务院" },
+  { id:"n78", title:"国务院关于印发《实施就业优先战略“十五五”规划》的通知", source:"中国政府网",
+    issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-17",
+    story_line:"实施就业优先战略\"十五五\"规划", stage:"公布执行", cross_dept:false,
+    lead_dept:"国务院", support_depts:[],
+    actors:[{name:"国务院", role:"权袋子", action:"实施就业优先战略“十五五”规划"}], rules:["实施就业优先战略“十五五”规划"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7072482.htm", summary:"国务院关于印发《实施就业优先战略 “十五五”规划》的通知 国发〔2026〕16号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 现将《实施就业优先战略“十五五”规划》印发给你们，请认真贯彻...", doc_no:"国发〔2026〕16号", pub_org:"国务院" },
+  { id:"n79", title:"住房城乡建设部 国家数据局关于全面建立房屋建筑统一代码制度的通知", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-06-17",
+    story_line:"住房城乡建设部 国家数据局关于全面建立房屋建筑统一代码制度的通知", stage:"细则落地", cross_dept:true,
+    lead_dept:"住房城乡建设部", support_depts:["国家数据局"],
+    actors:[{name:"住房城乡建设部", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家数据局", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["房产", "科技"], primary_tag:"房产",
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7072543.htm", summary:"住房城乡建设部 国家数据局关于全面建立房屋建筑统一代码制度的通知 建办〔2026〕32号 各省、自治区、直辖市住房城乡建设厅（委、管委）及有关部门、数据管理部门，新疆生产建设兵团住房城乡建设局、数据局...", doc_no:"建办〔2026〕32号", pub_org:"住房城乡建设部 国家数据局" },
+  { id:"n80", title:"人力资源社会保障部等4部门关于支持海洋经济发展促进就业创业的通知", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-06-16",
+    story_line:"人力资源社会保障部等4部门关于支持海洋经济发展促进就业创业的通知", stage:"细则落地", cross_dept:true,
+    lead_dept:"人力资源社会保障部", support_depts:["自然资源部", "国家发展改革委", "交通运输部"],
+    actors:[{name:"人力资源社会保障部", role:"权袋子", action:"出规划/准入/标准"}, {name:"自然资源部", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家发展改革委", role:"权袋子", action:"出规划/准入/标准"}, {name:"交通运输部", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7072347.htm", summary:"人力资源社会保障部等4部门关于支持海洋经济发展促进就业创业的通知 人社部发〔2026〕32号 各省、自治区、直辖市及新疆生产建设兵团人力资源社会保障厅（局）、自然资源（海洋）主管部门、发展改革委、交通...", doc_no:"人社部发〔2026〕32号", pub_org:"人力资源社会保障部 自然资源部 国家发展改革委 交通运输部" },
+  { id:"n81", title:"关于印发《实施多式联运攻坚 打通堵点卡点行动方案（2026-2030年）》的通知", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-06-16",
+    story_line:"实施多式联运攻坚 打通堵点卡点行动方案（2026-2030年）", stage:"公布执行", cross_dept:true,
+    lead_dept:"交通运输部", support_depts:["国家发展改革委", "财政部", "自然资源部", "国家铁路局", "中国民航局", "国家邮政局", "中国国家铁路集团有限公司"],
+    actors:[{name:"国家发展改革委", role:"钱袋子", action:"实施多式联运攻坚 打通堵点卡点行动方案（2026-2030年）"}, {name:"财政部", role:"钱袋子", action:"实施多式联运攻坚 打通堵点卡点行动方案（2026-2030年）"}, {name:"交通运输部", role:"权袋子", action:"实施多式联运攻坚 打通堵点卡点行动方案（2026-2030年）"}, {name:"国家发展改革委", role:"权袋子", action:"实施多式联运攻坚 打通堵点卡点行动方案（2026-2030年）"}, {name:"自然资源部", role:"权袋子", action:"实施多式联运攻坚 打通堵点卡点行动方案（2026-2030年）"}, {name:"国家铁路局", role:"权袋子", action:"实施多式联运攻坚 打通堵点卡点行动方案（2026-2030年）"}, {name:"国家邮政局", role:"权袋子", action:"实施多式联运攻坚 打通堵点卡点行动方案（2026-2030年）"}], rules:["实施多式联运攻坚 打通堵点卡点行动方案（2026-2030年）"], money_moved:true, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7072253.htm", summary:"交通运输部 国家发展改革委 财政部 自然资源部 国家铁路局 中国民航局 国家邮政局 中国国家铁路集团有限公司关于印发《实施多式联运攻坚 打通堵点卡点行动方案（2026-2030年）》的通知 交规划发〔...", doc_no:"交规划发〔2026〕51号", pub_org:"交通运输部 国家发展改革委 财政部 自然资源部 国家铁路局 中国民航局 国家邮政局 中国国家铁路集团有限公司" },
+  { id:"n82", title:"关于印发《都市圈城际通勤效率提升工程实施方案（2026－2030年）》的通知", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-06-16",
+    story_line:"都市圈城际通勤效率提升工程实施方案（2026－2030年）", stage:"公布执行", cross_dept:true,
+    lead_dept:"交通运输部", support_depts:["国家发展改革委", "自然资源部", "住房城乡建设部", "国家铁路局", "中国民用航空局", "国家邮政局", "中国国家铁路集团有限公司"],
+    actors:[{name:"交通运输部", role:"权袋子", action:"都市圈城际通勤效率提升工程实施方案（2026－2030年）"}, {name:"国家发展改革委", role:"权袋子", action:"都市圈城际通勤效率提升工程实施方案（2026－2030年）"}, {name:"自然资源部", role:"权袋子", action:"都市圈城际通勤效率提升工程实施方案（2026－2030年）"}, {name:"住房城乡建设部", role:"权袋子", action:"都市圈城际通勤效率提升工程实施方案（2026－2030年）"}, {name:"国家铁路局", role:"权袋子", action:"都市圈城际通勤效率提升工程实施方案（2026－2030年）"}, {name:"中国民用航空局", role:"权袋子", action:"都市圈城际通勤效率提升工程实施方案（2026－2030年）"}, {name:"国家邮政局", role:"权袋子", action:"都市圈城际通勤效率提升工程实施方案（2026－2030年）"}], rules:["都市圈城际通勤效率提升工程实施方案（2026－2030年）"], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7072250.htm", summary:"交通运输部 国家发展改革委 自然资源部 住房城乡建设部 国家铁路局 中国民用航空局 国家邮政局 中国国家铁路集团有限公司关于印发《都市圈城际通勤效率提升工程实施方案（2026－2030年）》的通知 交...", doc_no:"交规划发〔2026〕49号", pub_org:"交通运输部 国家发展改革委 自然资源部 住房城乡建设部 国家铁路局 中国民用航空局 国家邮政局 中国国家铁路集团有限公司" },
+  { id:"n83", title:"关于开展重点行业节能降碳改造攻坚三年行动的通知", source:"中国政府网",
+    issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-06-15",
+    story_line:"关于开展重点行业节能降碳改造攻坚三年行动的通知", stage:"细则落地", cross_dept:true,
+    lead_dept:"国家发展改革委", support_depts:["工业和信息化部", "生态环境部", "国务院国资委", "国家能源局"],
+    actors:[{name:"国家发展改革委", role:"权袋子", action:"出规划/准入/标准"}, {name:"工业和信息化部", role:"权袋子", action:"出规划/准入/标准"}, {name:"生态环境部", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家能源局", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
+    upstream:[], midstream:[], downstream:[], topic_tags:["能源"], primary_tag:"能源",
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7072084.htm", summary:"国家发展改革委等部门关于开展重点行业节能降碳改造攻坚三年行动的通知 发改环资〔2026〕698号 各省、自治区、直辖市及计划单列市、新疆生产建设兵团发展改革委、工业和信息化主管部门、生态环境厅（局）、...", doc_no:"发改环资〔2026〕698号", pub_org:"国家发展改革委 工业和信息化部 生态环境部 国务院国资委 国家能源局" }
+];
+/* NEWS_DATA_END */
+
+/* ================= 外链跳转：优先跳转具体新闻详情页，无则站内检索 ================= */
+/*
+  每条新闻可配 link 字段（真实详情页 URL）。点击时：
+    ① 有 link → 直接跳转原文详情页（推荐）
+    ② 无 link → 跳转到权威网站站内检索该政策标题（fallback）
+  可信来源预置：新华网 / 人民网 / 中国政府网，改 NEWS_SITE 切换默认源。
+*/
+const NEWS_SITES = {
+  xinhua:  { name:"新华网", url: q => `https://so.news.cn/#search/0/${encodeURIComponent(q)}/1/` },
+  people:  { name:"人民网", url: q => `http://search.people.cn/s/?keyword=${encodeURIComponent(q)}&st=0` },
+  gov:     { name:"中国政府网", url: q => `https://sousuo.www.gov.cn/sousuo/search.shtml?searchWord=${encodeURIComponent(q)}` }
+};
+const NEWS_SITE = "xinhua"; // 默认跳转新华网，可改为 "people" / "gov"
+
+/* 占位/未发生的条目不提供跳转（无可检索的真实事件） */
+const NO_JUMP = new Set(["a6"]);
+function canJump(n){ return !NO_JUMP.has(n.id) && n.stage !== "待落地"; }
+
+/* 从标题中提取最利于检索的关键词 */
+const GENERIC_DOC = new Set(["意见","通知","办法","决定","方案","规定","条例","公告","报告","纲要"]);
+function searchKeyword(n){
+  const m = String(n.title).match(/《([^》]+)》/);
+  let kw = m ? m[1] : String(n.title).replace(/[（(].*?[）)]/g,"").trim();
+  if(kw.length < 4 || GENERIC_DOC.has(kw)) kw = `${n.story_line} ${kw}`.trim();
+  return kw;
+}
+/* 生成该新闻的外链 URL：优先 link 字段（直接详情页），否则 fallback 站内检索 */
+function newsUrl(n){
+  if(n.link) return n.link;
+  return NEWS_SITES[NEWS_SITE].url(searchKeyword(n));
+}
+
+/* ================= 常量与工具 ================= */
+/* 固定的一级分类清单：始终全部显示（即使某类暂无新闻，也保留入口）。
+   若要增删分类，改这一处即可；一条新闻可同属多个分类（topic_tags）。 */
+const CATS = ["财政","健康","科技","教育","能源","汽车","环保","政务","房产"];
+const TAG_LABEL = { 房产:"房产", 汽车:"汽车", 能源:"能源", 环保:"环保",
+  教育:"教育", 科技:"科技", 财政:"财政", 政务:"政务", 健康:"健康" };
+const STAGE_ORDER = ["内部定调","高层动员","公布执行","细则落地","待落地"];
+const LEVEL_ORDER = ["中办/国办","国务院","部委/机构"];
+const LEVEL_RANK  = { "中办/国办":3, "国务院":2, "部委/机构":1 };
+
+const state = { tab:"全部", roles:new Set(), stages:new Set(), levels:new Set(), open:new Set(), view:"index", carIndex:0 };
+
+const uniq = a => [...new Set(a)];
+const byId = id => document.getElementById(id);
+function esc(s){ return String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function daysBetween(a,b){ return Math.round((new Date(b)-new Date(a))/86400000); }
+
+/* 将新闻按 story_line 聚合成脉络对象 */
+function buildStories(list){
+  const map = new Map();
+  // 归一化 story_line：弯引号↔直引号、书名号/括号、全半角空白差异，
+  // 避免同一政策因引号字符不同被拆成多条脉络。
+  const normSl = s =>
+    (s||"").replace(/[\u201c\u201d\u201e\u201f\u2033\u2036]/g,'"')
+             .replace(/[\u2018\u2019\u201a\u201b]/g,"'")
+             .replace(/[《》〈〉【】\[\]]/g,'')
+             .replace(/\s+/g,' ').trim();
+  list.forEach(n=>{
+    const key = normSl(n.story_line);
+    if(!map.has(key)) map.set(key, []);
+    map.get(key).push(n);
+  });
+  // 防御去重：同一「标题+日期」在脉络内只保留一条，
+  // 防止任何残留/未来的数据重复渲染成两条（数据层已按 canon_key 兜底）。
+  for(const arr of map.values()){
+    const seen = new Set();
+    for(let i=arr.length-1;i>=0;i--){
+      const k = (arr[i].title||"") + "|" + (arr[i].date_published||arr[i].date_signed||"");
+      if(seen.has(k)) arr.splice(i,1); else seen.add(k);
+    }
+  }
+  const stories = [];
+  const nd = n => n.date_published || n.date_signed || "";
+  for(const [name, items] of map){
+    // 脉络内新闻按时间正序（老→新），使时间线自上而下顺读；同期回退阶段序
+    items.sort((x,y)=> nd(x)<nd(y)?-1 : nd(x)>nd(y)?1 : STAGE_ORDER.indexOf(x.stage)-STAGE_ORDER.indexOf(y.stage));
+    const latestDate = items.map(nd).filter(Boolean).sort().slice(-1)[0] || "";
+    const allActors = items.flatMap(n=>n.actors);
+    const money = allActors.filter(a=>a.role==="钱袋子");
+    const power = allActors.filter(a=>a.role==="权袋子");
+    const dedup = arr => { const m=new Map(); arr.forEach(a=>m.set(a.name+"|"+a.action,a)); return [...m.values()]; };
+    // 闭环判定：完全以实际角色数组（钱/权 actor）为准（数据层已保证 actor 与 flag 同源）。
+    // 「有没有权袋子动作」与「权动了没有」来自同一数据源，绝不自相矛盾。
+    const moneyMoved = money.length > 0;
+    const powerMoved = power.length > 0;
+    // 发文部门(牵头) + 参与部门：取自接口 puborg 结构化字段（annotate 已解析）
+    const leadDept = items.map(n=>n.lead_dept).find(Boolean) || "";
+    const supportDepts = uniq(items.flatMap(n=>n.support_depts||[])).filter(d=>d!==leadDept);
+    const topLevel = LEVEL_ORDER.find(lv=> items.some(n=>n.issuer_level===lv)) || items[0].issuer_level;
+    const latestStage = items.map(n=>n.stage).sort((a,b)=>STAGE_ORDER.indexOf(b)-STAGE_ORDER.indexOf(a))[0];
+    // 脉络主分类：脉络内各条 primary_tag 的众数（多数决定）；并列时取首条的 primary_tag。
+    const primaryFreq = {};
+    items.forEach(n=>{ const p = n.primary_tag || (n.topic_tags&&n.topic_tags[0]) || "政务"; primaryFreq[p] = (primaryFreq[p]||0)+1; });
+    let primaryTag = items[0].primary_tag || (items[0].topic_tags&&items[0].topic_tags[0]) || "政务";
+    let primaryMax = -1;
+    for (const k in primaryFreq){ if (primaryFreq[k] > primaryMax){ primaryMax = primaryFreq[k]; primaryTag = k; } }
+    // 标签按"主分类优先"排序展示（次要标签仍保留，但仅主分类决定归属 tab）
+    const tagsSorted = uniq(items.flatMap(n=>n.topic_tags)).slice().sort((a,b)=> (b===primaryTag?1:0) - (a===primaryTag?1:0));
+    stories.push({
+      name, items,
+      tags: tagsSorted,
+      primaryTag,
+      levels: uniq(items.map(n=>n.issuer_level)),
+      topLevel,
+      crossDept: items.some(n=>n.cross_dept),
+      importance: items.some(n=>n.importance==="high") ? "high" : (items.some(n=>n.importance==="medium")?"medium":"low"),
+      parties: uniq(allActors.map(a=>a.name)),
+      leadDept, supportDepts,
+      money: dedup(money), power: dedup(power),
+      rules: uniq(items.flatMap(n=>n.rules)),
+      moneyMoved, powerMoved, closed: moneyMoved && powerMoved,
+      latestStage, latestDate,
+      upstream: uniq(items.flatMap(n=>n.upstream)),
+      midstream: uniq(items.flatMap(n=>n.midstream)),
+      downstream: uniq(items.flatMap(n=>n.downstream)),
+      roles: uniq(allActors.map(a=>a.role))
+    });
+  }
+  // 脉络按「最新更新时间」倒序：最近有新动静的脉络排在最前
+  stories.sort((a,b)=> a.latestDate<b.latestDate?1 : a.latestDate>b.latestDate?-1 : 0);
+  return stories;
+}
+
+/* 计算签发→公布时间差（取脉络内含双日期的关键新闻） */
+function incubation(items){
+  const c = items.find(n=>n.date_signed && n.date_published);
+  if(!c) return null;
+  return { signed:c.date_signed, published:c.date_published, days:daysBetween(c.date_signed,c.date_published) };
+}
+
+/* ================= 渲染 ================= */
+const ALL_STORIES = buildStories(NEWS);
+
+function renderStats(){
+  byId("stats").innerHTML = `
+    <div class="stat"><b>${ALL_STORIES.length}</b><span>政策脉络</span></div>
+    <div class="stat"><b>${NEWS.length}</b><span>项新闻</span></div>
+    <div class="stat"><b>${CATS.length}</b><span>民生板块</span></div>
+    <div class="stat"><b>${ALL_STORIES.filter(s=>s.closed).length}</b><span>已闭环落地</span></div>`;
+}
+
+function renderTabs(){
+  // 固定 9 大分类始终全显示（即使某类暂无新闻，计数显示 0）
+  const items = ["全部", ...CATS];
+  byId("tabs").innerHTML = items.map(t=>{
+    const cnt = t==="全部" ? ALL_STORIES.length : ALL_STORIES.filter(s=>s.primaryTag===t).length;
+    const label = t==="全部" ? "全部" : (TAG_LABEL[t]||t);
+    const empty = (t!=="全部" && cnt===0) ? " empty" : "";
+    return `<div class="tab ${state.tab===t?"active":""}${empty}" data-tab="${esc(t)}">${esc(label)}<span class="cnt">${cnt}</span></div>`;
+  }).join("");
+  byId("tabs").querySelectorAll(".tab").forEach(el=>{
+    el.onclick = ()=>{ state.tab = el.dataset.tab; state.carIndex=0; state.view="index"; render(); };
+  });
+}
+
+function renderFilterChips(){
+  byId("stageChips").innerHTML = STAGE_ORDER.map(s=>
+    `<button class="chip ${state.stages.has(s)?"on":""}" data-f="stage" data-v="${s}">${s}</button>`).join("");
+  byId("levelChips").innerHTML = LEVEL_ORDER.map(l=>
+    `<button class="chip ${state.levels.has(l)?"on":""}" data-f="level" data-v="${l}">${l}</button>`).join("");
+  document.querySelectorAll("#filters .chip").forEach(el=>{
+    const f=el.dataset.f, v=el.dataset.v;
+    const set = f==="role"?state.roles : f==="stage"?state.stages : state.levels;
+    el.classList.toggle("on", set.has(v));
+    el.onclick = ()=>{ set.has(v)?set.delete(v):set.add(v); state.carIndex=0; render(); };
+  });
+}
+
+/* 依据 tab + filters 过滤脉络 */
+function filterStories(){
+  return ALL_STORIES.filter(s=>{
+    if(state.tab!=="全部" && s.primaryTag!==state.tab) return false;
+    if(state.roles.size && ![...state.roles].every(r=>s.roles.includes(r))) return false;
+    if(state.stages.size && ![...state.stages].some(st=>s.items.some(n=>n.stage===st))) return false;
+    if(state.levels.size && ![...state.levels].some(lv=>s.levels.includes(lv))) return false;
+    return true;
+  });
+}
+
+function stepRow(no,name,bodyHtml){
+  return `<div class="step"><div class="step-tag"><span class="step-no">${no}</span><span class="step-name">${name}</span></div><div class="step-body">${bodyHtml}</div></div>`;
+}
+
+function renderStoryCard(s){
+  const incub = incubation(s.items);
+
+  // ① 定性
+  const impCls = s.importance==="high"?"imp-high":s.importance==="medium"?"imp-medium":"";
+  const impTxt = {high:"高重要度",medium:"中重要度",low:"待观察"}[s.importance];
+  const qual = `<div class="qual">
+      <span class="badge lv">${esc(s.topLevel)}</span>
+      <span class="badge ${impCls}">${impTxt}</span>
+      ${s.crossDept?'<span class="badge">跨部门协调</span>':'<span class="badge">单部门推进</span>'}
+    </div>`;
+
+  // ② 看人：发文部门(牵头) + 参与部门，取自接口 puborg 结构化字段
+  const deptChips = [];
+  if(s.leadDept) deptChips.push(`<span class="party lead">牵头 · ${esc(s.leadDept)}</span>`);
+  (s.supportDepts||[]).forEach(d=> deptChips.push(`<span class="party">${esc(d)}</span>`));
+  const parties = deptChips.length
+    ? `<div class="parties">${deptChips.join("")}${(s.supportDepts&&s.supportDepts.length)?'<span class="cross">· 多部门协同</span>':''}</div>`
+    : (s.parties.length
+        ? `<div class="parties">${s.parties.map(p=>`<span class="party">${esc(p)}</span>`).join("")}</div>`
+        : `<span class="none">尚未明确具体发文/参与部门（定调/动员阶段）</span>`);
+
+  // ③ 拆核心：钱/权
+  const moneyHtml = s.money.length
+    ? s.money.map(a=>`<div class="actor"><span>${esc(a.name)}</span><span class="act">${esc(a.action)}</span></div>`).join("")
+    : `<span class="none">暂无钱袋子动作</span>`;
+  const powerHtml = s.power.length
+    ? s.power.map(a=>`<div class="actor"><span>${esc(a.name)}</span><span class="act">${esc(a.action)}</span></div>`).join("")
+    : `<span class="none">暂无权袋子动作</span>`;
+  const coreHtml = `<div class="actor-cols">
+      <div class="acol money"><div class="acol-hd">💰 钱袋子（出钱）</div>${moneyHtml}</div>
+      <div class="acol power"><div class="acol-hd">🏛 权袋子（出政策）</div>${powerHtml}</div>
+    </div>`;
+
+  // ③ 制度
+  const rulesHtml = s.rules.length
+    ? `<div class="rules">${s.rules.map(r=>`<span class="rule-pill">${esc(r)}</span>`).join("")}</div>`
+    : `<span class="none">暂无已出台的具体规则/标准</span>`;
+
+  // ④ 排时间
+  const tl = s.items.map(n=>{
+    const done = n.date_published || n.date_signed;
+    const dateTxt = n.date_signed && n.date_published
+      ? `签发 ${n.date_signed} · 公布 ${n.date_published}`
+      : n.date_published ? `公布 ${n.date_published}`
+      : n.date_signed ? `签发 ${n.date_signed}` : "待发生";
+    const jump = canJump(n);
+    const cls = `tl-item ${n.stage==='待落地'?'pending':(done?'done':'')} ${jump?'clickable':''}`;
+    const inner = `<div class="tl-node"><span class="d"></span><span class="bar"></span></div>
+        <div class="tl-body"><div class="tl-stage">${esc(n.stage)}</div>
+          <div class="tl-title">${esc(n.title)}${jump?`<span class="tl-open">查看原文 ↗</span>`:''}</div>
+          <div class="tl-date">${esc(dateTxt)}</div></div>`;
+    return jump
+      ? `<a class="${cls}" href="${esc(newsUrl(n))}" target="_blank" rel="noopener">${inner}</a>`
+      : `<div class="${cls}">${inner}</div>`;
+  }).join("");
+  const incubHtml = incub
+    ? `<div class="incub">⏳ 酝酿期 <b>${incub.days} 天</b>（${incub.signed} 内部签发 → ${incub.published} 对外公布）：反映内部定调到向社会公布的决策节奏。</div>`
+    : "";
+  const timeHtml = `<div class="tl">${tl}</div>${incubHtml}`;
+
+  // ⑤ 找闭环
+  const closureHtml = `<div class="closure">
+      <span class="cl-item money ${s.moneyMoved?'on':''}">${s.moneyMoved?'✓':'○'} 钱动了</span>
+      <span class="cl-item power ${s.powerMoved?'on':''}">${s.powerMoved?'✓':'○'} 权动了</span>
+      <span class="cl-final ${s.closed?'yes':'no'}">${s.closed?'✅ 政策已闭环落地':'⏳ 尚未闭环（钱/权未同时到位）'}</span>
+    </div>`;
+
+  // ⑥ 接宏观
+  const macroCell = (lb,arr)=>`<div class="macro-node"><div class="mn-lb">${lb}</div><div class="mn-v">${arr.length?arr.map(esc).join("、"):"—"}</div></div>`;
+  const macroHtml = (s.upstream.length||s.midstream.length||s.downstream.length)
+    ? `<div class="macro">${macroCell("上游·资源",s.upstream)}<span class="macro-arrow">→</span>${macroCell("中游·制造",s.midstream)}<span class="macro-arrow">→</span>${macroCell("下游·影响",s.downstream)}</div>`
+    : `<span class="none">暂无宏观链路数据</span>`;
+
+  // 脉络内逐条新闻明细：常驻显示（不再需要「展开明细」按钮），置于卡片顶部
+  const detail = `<div class="detail"><div class="detail-inner">
+      <div class="detail-hd">脉络内逐条新闻（${s.items.length}）</div>
+      ${s.items.map(renderNewsDetail).join("")}
+    </div></div>`;
+
+  // 六步拆解状态摘要（折叠时显示一行）
+  const stepStatus = s.closed
+    ? `<span class="sd-status ok">✅ 已闭环落地</span>`
+    : `<span class="sd-status pending">${s.moneyMoved?'✓':'○'}钱 ${s.powerMoved?'✓':'○'}权 · 尚未闭环</span>`;
+
+  return `<div class="story open" data-story="${esc(s.name)}">
+    <div class="story-hd">
+      <div class="sh-main">
+        <div class="sh-line"><span class="sh-name">${esc(s.name)}</span></div>
+        <div class="sh-meta"><span>最高层级 <b>${esc(s.topLevel)}</b></span><span>最新阶段 <b>${esc(s.latestStage)}</b></span>${s.latestDate?`<span>更新 <b>${esc(s.latestDate)}</b></span>`:''}<span>共 <b>${s.items.length}</b> 条新闻</span></div>
+        <div class="tags">${s.tags.map(t=>`<span class="tag ${t===s.primaryTag?'primary':''} ${t===state.tab?'hot':''}">${esc(TAG_LABEL[t]||t)}</span>`).join("")}</div>
+      </div>
+      <span class="closed-badge ${s.closed?'yes':'no'}">${s.closed?'已闭环落地':'跟踪中'}</span>
+    </div>
+    ${detail}
+    <details class="steps-details">
+      <summary>
+        <span class="sd-title">六步法 · 政策落地拆解</span>
+        ${stepStatus}
+        <span class="sd-arw">▸</span>
+      </summary>
+      <div class="steps">
+        ${stepRow("① 定性","这条有多重要",qual)}
+        ${stepRow("② 看人","参与方结构",parties)}
+        ${stepRow("③ 拆核心","钱袋子 vs 权袋子",coreHtml)}
+        ${stepRow("③ 制度","已出台规则",rulesHtml)}
+        ${stepRow("④ 排时间","过程追踪",timeHtml)}
+        ${stepRow("⑤ 找闭环","钱权是否同时到位",closureHtml)}
+        ${stepRow("⑥ 接宏观","上游→中游→下游",macroHtml)}
+      </div>
+    </details>
+  </div>`;
+}
+
+function renderNewsDetail(n){
+  const roles = n.actors.map(a=>`<span class="mini-role ${a.role==='钱袋子'?'money':'power'}">${esc(a.name)}·${esc(a.action)}</span>`).join("") || '<span class="none">—</span>';
+  const dateTxt = [n.date_signed?`签发 ${n.date_signed}`:null, n.date_published?`公布 ${n.date_published}`:null].filter(Boolean).join(" · ") || "待发生";
+  const orgTxt = [n.pub_org, n.doc_no].filter(Boolean).join(" · ");
+  const jump = canJump(n);
+  return `<div class="news">
+    <div class="news-top"><div class="news-title">${esc(n.title)}${jump?` <a class="news-open" href="${esc(newsUrl(n))}" target="_blank" rel="noopener">查看原文 ↗</a>`:''}</div><div class="news-src">${esc(n.source)}</div></div>
+    <div class="news-grid">
+      <div class="nf"><div class="k">① 层级 / 重要度</div><div class="v">${esc(n.issuer_level)} · ${({high:'高',medium:'中',low:'低'})[n.importance]}${n.cross_dept?' · 跨部门':''}</div></div>
+      <div class="nf"><div class="k">④ 时间</div><div class="v">${esc(dateTxt)}</div></div>
+      <div class="nf"><div class="k">发文机关 / 字号</div><div class="v">${esc(orgTxt)||'—'}</div></div>
+      <div class="nf"><div class="k">阶段</div><div class="v">${esc(n.stage)}</div></div>
+      <div class="nf"><div class="k">⑤ 钱/权</div><div class="v">${n.money_moved?'钱✓ ':''}${n.power_moved?'权✓':''}${(!n.money_moved&&!n.power_moved)?'未动作':''}</div></div>
+    </div>
+    <div class="nf" style="margin-top:8px"><div class="k">③ 钱袋子/权袋子</div><div class="v">${roles}</div></div>
+    ${n.rules.length?`<div class="nf" style="margin-top:6px"><div class="k">制度</div><div class="v">${n.rules.map(esc).join("、")}</div></div>`:""}
+    ${n.summary?`<div class="nf news-summary" style="margin-top:6px"><div class="k">📄 政策摘要</div><div class="v">${esc(n.summary)}</div></div>`:""}
+  </div>`;
+}
+
+/* 脉络目录（index 视图）：整屏列出当前板块下的全部脉络，
+   点任意一条 → 下钻到聚焦轮播（carousel）并定位到该脉络。 */
+function renderStoryIndexRow(s,i){
+  const tab = state.tab==="全部" ? "全部板块" : state.tab;
+  const tagHtml = s.tags.map(t=>`<span class="idx-tag ${t===s.primaryTag?'primary':''}">${esc(TAG_LABEL[t]||t)}</span>`).join("");
+  return `<button class="idx-row" type="button" data-idx="${i}">
+    <span class="idx-no">${i+1}</span>
+    <span class="idx-main">
+      <span class="idx-title">${esc(s.name)}</span>
+      <span class="idx-meta">最高层级 ${esc(s.topLevel)} · 共 ${s.items.length} 条${s.latestDate?` · 更新 ${esc(s.latestDate)}`:''} ${tagHtml}</span>
+    </span>
+    <span class="idx-right">
+      <span class="idx-stage">${esc(s.latestStage)}</span>
+      <span class="idx-closed">${s.closed?'已闭环':'跟踪中'}</span>
+    </span>
+    <span class="idx-arrow">›</span>
+  </button>`;
+}
+
+function renderCards(){
+  let list = filterStories();
+  // 每类最多 N 条脉络（政务放宽到40，其余20）：当天的脉络（latestDate===今天）全部展示；
+  // 若当天+过去合计超过上限，则截到上限（当天优先全显）。「全部」板块不截断。
+  if(state.tab !== "全部"){
+    const d = new Date(), p = n=>String(n).padStart(2,"0");
+    const todayStr = `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
+    const isToday = s => s.latestDate === todayStr;
+    const todayList = list.filter(isToday);
+    const pastList = list.filter(s=>!isToday(s));
+    const LIMIT = state.tab === "政务" ? 40 : 20;
+    if(todayList.length < LIMIT){
+      list = todayList.concat(pastList.slice(0, LIMIT - todayList.length));
+    } // 当天 ≥ 上限条则当天全部展示，不再截断
+  }
+  if(!list.length){
+    byId("cards").innerHTML = `<div class="empty"><div class="big">🗂</div>当前板块 / 筛选条件下暂无匹配的政策脉络<br>试试切换板块或点击"清除筛选"</div>`;
+    return;
+  }
+  if(state.carIndex > list.length-1) state.carIndex = list.length-1;
+  if(state.carIndex < 0) state.carIndex = 0;
+
+  if(state.view === "index"){
+    const tabTxt = state.tab==="全部" ? "全部板块" : state.tab;
+    byId("cards").innerHTML = `
+      <div class="idx-head">「${esc(tabTxt)}」下共 <b>${list.length}</b> 条政策脉络，点击任意一条进入聚焦阅读 ↓</div>
+      <div class="idx-list">${list.map(renderStoryIndexRow).join("")}</div>`;
+    byId("cards").querySelectorAll(".idx-row").forEach(el=>{
+      el.onclick = ()=>{
+        state.carIndex = parseInt(el.dataset.idx,10) || 0;
+        state.view = "carousel";
+        render();
+      };
+    });
+    return;
+  }
+
+  // carousel 视图：卡片顶部提供「‹ 返回脉络目录」下钻返回入口
+  const slidesHtml = list.map(s=>`<div class="slide">${renderStoryCard(s)}</div>`).join("");
+  const dots = list.map((s,i)=>`<span class="car-dot ${i===state.carIndex?'active':''}" data-i="${i}"></span>`).join("");
+  byId("cards").innerHTML = `
+    <div class="car-back"><button class="idx-back" id="backToIndex" type="button">‹ 返回脉络目录</button></div>
+    <div class="carousel">
+      <div class="car-nav">
+        <button class="car-btn prev" type="button" aria-label="上一条">‹</button>
+        <div class="car-dots">${dots}</div>
+        <button class="car-btn next" type="button" aria-label="下一条">›</button>
+      </div>
+      <div class="car-viewport">
+        <div class="car-track">${slidesHtml}</div>
+        <div class="car-progress"><b id="carPos">${state.carIndex+1}</b> / ${list.length}</div>
+      </div>
+    </div>`;
+
+  const back = byId("backToIndex");
+  if(back) back.onclick = ()=>{ state.view = "index"; render(); };
+
+  byId("cards").querySelectorAll("[data-toggle]").forEach(el=>{
+    el.onclick = ()=>{
+      const k = el.dataset.toggle;
+      state.open.has(k)?state.open.delete(k):state.open.add(k);
+      render();
+    };
+  });
+  // 新闻查证链接改用真实 <a href target=_blank>，浏览器原生跳转，
+  // 不受预览沙箱/弹窗拦截影响；仅阻止冒泡以免误触发卡片展开。
+  byId("cards").querySelectorAll("a.news-open, a.tl-item").forEach(el=>{
+    el.addEventListener("click", e=>e.stopPropagation());
+  });
+
+  bindCarousel(list.length);
+}
+
+/* 聚焦轮播：← → 按钮 / 方向键 / 触屏滑动 / 圆点，均切换到相邻脉络卡 */
+function bindCarousel(n){
+  const root = byId("cards");
+  const track = root.querySelector(".car-track");
+  const vp = root.querySelector(".car-viewport");
+  if(!track || !vp) return;
+
+  const go = (i)=>{
+    i = Math.max(0, Math.min(n-1, i));
+    state.carIndex = i;
+    track.style.transform = `translateX(-${i*100}%)`;
+    const pos = byId("carPos"); if(pos) pos.textContent = i+1;
+    root.querySelectorAll(".car-dot").forEach((d,di)=>d.classList.toggle("active", di===i));
+    const prev = root.querySelector(".car-btn.prev");
+    const next = root.querySelector(".car-btn.next");
+    if(prev) prev.disabled = (i===0);
+    if(next) next.disabled = (i===n-1);
+  };
+
+  const prev = root.querySelector(".car-btn.prev");
+  const next = root.querySelector(".car-btn.next");
+  if(prev) prev.onclick = ()=>go(state.carIndex-1);
+  if(next) next.onclick = ()=>go(state.carIndex+1);
+  root.querySelectorAll(".car-dot").forEach(d=>{
+    d.onclick = ()=>go(parseInt(d.dataset.i,10));
+  });
+
+  // 键盘左右键（仅在轮播模式生效）
+  const onKey = (e)=>{
+    if(state.view!=="carousel") return;
+    if(e.key==="ArrowLeft"){ e.preventDefault(); go(state.carIndex-1); }
+    else if(e.key==="ArrowRight"){ e.preventDefault(); go(state.carIndex+1); }
+  };
+  document.removeEventListener("keydown", onKey);
+  document.addEventListener("keydown", onKey);
+
+  // 触屏滑动
+  let sx=0, sy=0, sw=false;
+  const onStart = (e)=>{ const t=e.touches?e.touches[0]:e; sx=t.clientX; sy=t.clientY; sw=true; };
+  const onEnd = (e)=>{
+    if(!sw) return; sw=false;
+    const t=e.changedTouches?e.changedTouches[0]:e;
+    const dx=t.clientX-sx, dy=t.clientY-sy;
+    if(Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)) go(state.carIndex + (dx<0?1:-1));
+  };
+  vp.removeEventListener("touchstart", onStart);
+  vp.removeEventListener("touchend", onEnd);
+  vp.addEventListener("touchstart", onStart, {passive:true});
+  vp.addEventListener("touchend", onEnd, {passive:true});
+
+  go(state.carIndex);
+}
+
+function render(){ renderTabs(); renderFilterChips(); renderViewbar(); renderCards(); }
+
+function renderViewbar(){
+  const seg = byId("seg"); if(!seg) return;
+  seg.querySelectorAll(".seg-btn").forEach(b=>{
+    b.classList.toggle("active", b.dataset.view===state.view);
+  });
+  byId("vbHint").textContent = state.view==="carousel"
+    ? "聚焦阅读：左右滑（← → 按钮 / 方向键 / 触屏滑动）细读单条脉络，点「返回脉络目录」回目录"
+    : "脉络目录：先纵览本板块全部脉络，点任意一条下钻进入聚焦阅读";
+}
+
+byId("reset").onclick = ()=>{ state.roles.clear(); state.stages.clear(); state.levels.clear(); state.carIndex=0; render(); };
+
+byId("seg").querySelectorAll(".seg-btn").forEach(b=>{
+  b.onclick = ()=>{ state.view = b.dataset.view; state.carIndex=0; render(); };
+});
+
+renderStats();
+render();
+</script>
+</body>
+</html>
