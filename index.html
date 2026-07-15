@@ -270,8 +270,11 @@
   .car-viewport{overflow:hidden;border-radius:var(--radius);min-height:180px}
   .car-track{display:flex;transition:transform .42s var(--ease)}
   .slide{flex:0 0 100%;max-width:100%;min-width:0;padding:4px;box-sizing:border-box}
-  .car-nav{display:flex;align-items:center;justify-content:center;gap:18px;
-    padding:16px 28px;border-bottom:1px solid var(--line)}
+  .car-nav{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;
+    padding:16px 0;border-bottom:1px solid var(--line)}
+  .car-nav>.car-btn:first-child{justify-self:center}
+  .car-nav>.car-dots{justify-self:center}
+  .car-nav>.car-btn:last-child{justify-self:center}
   .car-btn{width:52px;height:52px;border-radius:50%;
     border:1.5px solid var(--line2);background:var(--panel);color:var(--txt);
     font-size:26px;line-height:1;cursor:pointer;transition:all .16s var(--ease);
