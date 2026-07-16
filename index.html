@@ -398,8 +398,8 @@
 .li-title:hover{color:var(--accent)}
   .li-meta{font-size:11px;color:var(--txt3);margin:1px 0}
 
-  /* 地方试点（无中央对应文件）：与 .local-impl 同族卡片语言，置于「全部」视图顶部 */
-  .pilot-card{border:1px solid var(--accent);border-radius:10px;background:var(--panel);overflow:hidden;margin-bottom:18px}
+  /* 地方新闻（含地方试点·无中央对应文件）：与 .local-impl 同族卡片语言，置于具体分类 tab 的脉络目录之后；「全部」中央目录不展示 */
+  .pilot-card{border:1px solid var(--accent);border-radius:10px;background:var(--panel);overflow:hidden;margin-top:18px}
   .pilot-hd{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--accent);background:rgba(210,105,30,.12);padding:12px 16px;border-bottom:1px solid var(--accent-line);font-family:var(--sans);letter-spacing:.3px}
   .pilot-badge{font-size:10px;font-weight:600;color:#8a5a3e;background:rgba(138,90,62,.12);padding:1px 8px;border-radius:10px;border:1px solid rgba(138,90,62,.34);margin-left:6px;white-space:nowrap}
   .pilot-body{padding:8px 14px 14px}
@@ -1499,43 +1499,34 @@ function renderStoryIndexRow(s,i){
   </button>`;
 }
 
-function renderLocalPilots(){
-  // 地方试点（无中央对应文件）：从 LOCAL_PILOTS 按分类 tag 分组，仅「全部」视图展示（不进分类 tab）
-  const pilots = (LOCAL_PILOTS||[]).filter(p=>p.tag);
+function renderLocalPilots(tab){
+  // 地方新闻（按分类组织）：仅在具体分类 tab 的脉络目录之后展示，不进「全部」中央目录。
+  // 内容为「地方试点」——无中央对应文件的地方新闻，每条打标区分；普通地方新闻仍挂在各中央脉络卡片内。
+  if(tab === "全部") return "";
+  const pilots = (LOCAL_PILOTS||[]).filter(p=>p.tag === tab);
   if(!pilots.length) return "";
-  const groups = {};
-  pilots.forEach(p=>{ (groups[p.tag] = groups[p.tag]||[]).push(p); });
-  const cats = CATS.filter(c=>groups[c] && groups[c].length);
-  if(!cats.length) return "";
   const _dk = d => (d && d.length === 7) ? d + "-99" : d;
-  const sorted = arr => arr.slice().sort((a,b)=>{
+  const sorted = pilots.slice().sort((a,b)=>{
     const da = a.date||"", db = b.date||"";
     if(!da) return 1; if(!db) return -1;
     return _dk(db) < _dk(da) ? -1 : (_dk(db) > _dk(da) ? 1 : 0);
   });
-  const groupHtml = cats.map(c=>{
-    const all = sorted(groups[c]);
-    const CAP = 8;
-    const shown = all.slice(0, CAP);
-    const items = shown.map(p=>{
-      const dateTxt = p.date ? esc(p.date) : "日期未收录";
-      const metaBits = [dateTxt];
-      if(p.org) metaBits.push("对口 " + esc(p.org));
-      return `<div class="pilot-item">
-        <div class="pilot-top"><span class="pilot-region">${esc(p.region)}</span></div>
-        <a class="pilot-title" href="${esc(p.link||'#')}" target="_blank" rel="noopener">${esc(p.title)}</a>
-        <div class="pilot-meta">${metaBits.join(" · ")}</div>
-      </div>`;
-    }).join("");
-    const more = all.length > CAP ? `<div class="pilot-more">+${all.length - CAP} 条（仅显示最新 ${CAP} 条）</div>` : "";
-    return `<div class="pilot-group">
-      <div class="pilot-group-hd">${esc(TAG_LABEL[c]||c)} · ${all.length}</div>
-      ${items}${more}
+  const CAP = 12;
+  const shown = sorted.slice(0, CAP);
+  const items = shown.map(p=>{
+    const dateTxt = p.date ? esc(p.date) : "日期未收录";
+    const metaBits = [dateTxt];
+    if(p.org) metaBits.push("对口 " + esc(p.org));
+    return `<div class="pilot-item">
+      <div class="pilot-top"><span class="pilot-region">${esc(p.region)}</span><span class="pilot-badge">地方试点 · 无中央对应文件</span></div>
+      <a class="pilot-title" href="${esc(p.link||'#')}" target="_blank" rel="noopener">${esc(p.title)}</a>
+      <div class="pilot-meta">${metaBits.join(" · ")}</div>
     </div>`;
   }).join("");
+  const more = sorted.length > CAP ? `<div class="pilot-more">+${sorted.length - CAP} 条（仅显示最新 ${CAP} 条）</div>` : "";
   return `<div class="pilot-card">
-    <div class="pilot-hd">🛰 地方政策雷达<span class="pilot-badge">地方试点 · 无中央对应文件</span></div>
-    <div class="pilot-body">${groupHtml}</div>
+    <div class="pilot-hd">🛰 地方新闻<span class="pilot-badge">含地方试点 · 无中央对应文件</span></div>
+    <div class="pilot-body">${items}${more}</div>
   </div>`;
 }
 
@@ -1563,11 +1554,11 @@ function renderCards(){
 
   if(state.view === "index"){
     const tabTxt = state.tab==="全部" ? "全部板块" : state.tab;
-    const pilotsHtml = state.tab==="全部" ? renderLocalPilots() : "";
+    const pilotsHtml = state.tab!=="全部" ? renderLocalPilots(state.tab) : "";
     byId("cards").innerHTML = `
-      ${pilotsHtml}
       <div class="idx-head">「${esc(tabTxt)}」下共 <b>${list.length}</b> 条政策脉络，点击任意一条进入聚焦阅读 ↓</div>
-      <div class="idx-list">${list.map(renderStoryIndexRow).join("")}</div>`;
+      <div class="idx-list">${list.map(renderStoryIndexRow).join("")}</div>
+      ${pilotsHtml}`;
     byId("cards").querySelectorAll(".idx-row").forEach(el=>{
       el.onclick = ()=>{
         state.carIndex = parseInt(el.dataset.idx,10) || 0;
@@ -1578,12 +1569,10 @@ function renderCards(){
     return;
   }
 
-  // carousel 视图：卡片顶部提供「‹ 返回脉络目录」下钻返回入口
+  // carousel 视图：卡片顶部提供「‹ 返回脉络目录」下钻返回入口（聚焦单条脉络，不展示地方新闻面板）
   const slidesHtml = list.map(s=>`<div class="slide">${renderStoryCard(s)}</div>`).join("");
   const dots = list.map((s,i)=>`<span class="car-dot ${i===state.carIndex?'active':''}" data-i="${i}"></span>`).join("");
-  const pilotsHtml = state.tab==="全部" ? renderLocalPilots() : "";
   byId("cards").innerHTML = `
-    ${pilotsHtml}
     <div class="car-back"><button class="idx-back" id="backToIndex" type="button">返回脉络目录</button></div>
     <div class="carousel">
       <div class="car-nav">
