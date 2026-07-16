@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>时政新闻分析看板 · 从碎片新闻看清政策大局</title>
+<title>政策脉络追踪看板</title>
 <style>
   :root{
     --bg:#faf2e7; --bg2:#fdf6ec; --panel:#fffaf3; --panel2:#f3e7d8;
@@ -11,7 +11,7 @@
     --txt:#2e2722; --txt2:#6b5d4f; --txt3:#9a8a78;
     --accent:#d2691e; --accent-soft:rgba(210,105,30,.08); --accent-line:rgba(210,105,30,.34);
     --money:#b5790f; --money-bg:rgba(181,121,15,.12); --money-line:rgba(181,121,15,.34);
-    --power:#4a6fa5; --power-bg:rgba(74,111,165,.11); --power-line:rgba(74,111,165,.34);
+    --power:#8a5a3e; --power-bg:rgba(138,90,62,.11); --power-line:rgba(138,90,62,.34);
     --rule:#8a5a72; --rule-bg:rgba(138,90,114,.11);
     --ok:#4f9d5a; --ok-bg:rgba(79,157,90,.13); --ok-line:rgba(79,157,90,.36);
     --warn:#b07d1e; --pending:#8b8b7c;
@@ -46,7 +46,7 @@
   .disclaimer{margin-top:18px;font-size:12.5px;color:var(--txt3);
     background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--warn);
     border-radius:8px;padding:10px 14px;display:flex;gap:9px;align-items:flex-start;line-height:1.7}
-  .disclaimer b{color:var(--warn);font-weight:700}
+  .disclaimer b{color:var(--warn);font-weight:700;white-space:nowrap}
 
   /* ---------- Tabs (Layer 1) ---------- */
   .tabs-label{font-size:11.5px;color:var(--txt3);letter-spacing:3px;margin:30px 0 0;text-transform:uppercase;
@@ -107,7 +107,7 @@
   .tag.primary{color:#fff;background:var(--accent);border-color:var(--accent);font-weight:600}
 
   /* six-step checklist */
-  .steps{padding:8px 22px 22px}
+  .steps{padding:14px 18px}
   .step{display:flex;gap:16px;padding:14px 0;border-top:1px solid var(--line)}
   .step:first-child{border-top:none}
   .step-tag{flex:0 0 122px;display:flex;flex-direction:column;gap:3px}
@@ -176,31 +176,45 @@
   .macro-node .mn-v{font-size:12.5px;color:var(--txt2);line-height:1.55}
   .macro-arrow{flex:0 0 26px;display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:16px}
 
+  /* 三个模块 = 页面主内容，做成独立面板（圆角描边 + 标题带 + 模块间留白） */
+  .detail, .steps-details, .local-impl{
+    border:1px solid var(--accent-line);
+    border-radius:var(--radius-sm);
+    overflow:hidden;
+    margin-bottom:16px;
+    background:var(--panel);
+  }
+  .detail:last-child, .steps-details:last-child, .local-impl:last-child{margin-bottom:0}
   /* detail (per-news) */
-  .detail{border-top:1px solid var(--line);background:rgba(35,38,43,.05);padding:0}
-  .detail-inner{padding:17px 22px}
-  .detail-hd{font-size:11px;color:var(--txt3);letter-spacing:1.5px;margin-bottom:13px;text-transform:uppercase;font-family:var(--serif)}
+  .detail-body{padding:16px 18px}
+  .detail-hd{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--accent);background:rgba(210,105,30,.12);padding:12px 16px;border-bottom:1px solid var(--accent-line);font-family:var(--sans);letter-spacing:.3px}
 
   /* steps collapsible (default folded) */
-  .steps-details{border-top:1px solid var(--line);background:rgba(35,38,43,.03)}
   .steps-details > summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;
-    padding:14px 22px;user-select:none;transition:background .15s}
+    padding:12px 16px;user-select:none;transition:background .15s;background:rgba(210,105,30,.12);color:var(--accent);font-family:var(--sans)}
   .steps-details > summary::-webkit-details-marker{display:none}
-  .steps-details > summary:hover{background:rgba(35,38,43,.06)}
-  .sd-title{font-family:var(--serif);font-size:14.5px;font-weight:800;color:var(--txt)}
+  .steps-details > summary:hover{background:rgba(210,105,30,.18)}
+  .sd-title{font-family:var(--sans);font-size:14px;font-weight:700;color:var(--accent);letter-spacing:.3px}
   .sd-status{font-size:11.5px;font-weight:700;padding:3px 11px;border-radius:14px;border:1px solid var(--line2);color:var(--txt3);white-space:nowrap}
   .sd-status.ok{color:var(--ok);background:var(--ok-bg);border-color:var(--ok-line)}
   .sd-status.pending{color:var(--txt3);background:rgba(120,125,133),.1);border-color:var(--line2)}
   .sd-arw{margin-left:auto;color:var(--txt3);font-size:13px;transition:transform .2s}
   .steps-details[open] > summary .sd-arw{transform:rotate(90deg)}
-  .steps-details[open] > summary{border-bottom:1px solid var(--line)}
+  .steps-details[open] > summary{border-bottom:1px solid var(--accent-line)}
   .news{border:1px solid var(--line);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:11px;background:var(--panel)}
   .news:last-child{margin-bottom:0}
   .news-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start}
   .news-title{font-size:14.5px;font-weight:700;flex:1;min-width:0;line-height:1.5}
   .news-src{font-size:11.5px;color:var(--txt3);white-space:nowrap}
-  .news-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px 18px;margin-top:11px}
-  .nf{font-size:12.5px}
+  .news-grid{display:grid;grid-template-columns:78px 108px 1.4fr 1.7fr 0.5fr 0.5fr;gap:8px 10px;margin-top:11px;width:100%;box-sizing:border-box}
+  .nf{font-size:12.5px;min-width:0}
+  /* ①层级 ②时间 ⑤阶段 ⑥钱权：强制单行不换行 */
+  .news-grid .nf:nth-child(1), .news-grid .nf:nth-child(2),
+  .news-grid .nf:nth-child(5), .news-grid .nf:nth-child(6){
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+  }
+  /* ③钱袋子 ④发文机关：允许换行但不主动断词 */
+  .news-grid .nf:nth-child(3), .news-grid .nf:nth-child(4){word-break:break-word}
   .nf .k{color:var(--txt3);font-size:11px;letter-spacing:.3px}
   .nf .v{color:var(--txt2)}
   .news-summary .v{max-height:170px;overflow:auto;line-height:1.7;color:#5d5240;
@@ -267,7 +281,7 @@
 
   /* 轮播 */
   .carousel{position:relative}
-  .car-viewport{overflow:hidden;border-radius:var(--radius);min-height:180px}
+  .car-viewport{overflow-x:hidden;overflow-y:auto;border-radius:var(--radius);min-height:180px}
   .car-track{display:flex;transition:transform .42s var(--ease)}
   .slide{flex:0 0 100%;max-width:100%;min-width:0;padding:4px;box-sizing:border-box}
   .car-nav{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;
@@ -308,6 +322,10 @@
     background:var(--accent);transform:scaleY(0);transform-origin:center;transition:transform .22s var(--ease)}
   .idx-row:hover{background:var(--accent-soft);padding-left:22px}
   .idx-row:hover::before{transform:scaleY(1)}
+  /* 本轮新收录的脉络：左侧常亮金橙竖条 + 浅橙底，区别于普通行（仅此标识，不加文字徽标） */
+  .idx-row.is-new{background:var(--accent-soft);border-radius:0 12px 12px 0;padding-left:20px}
+  .idx-row.is-new::before{transform:scaleY(1);width:4px;background:var(--accent);box-shadow:0 0 0 1px rgba(210,105,30,.18)}
+  .idx-row.is-new:hover{background:rgba(210,105,30,.14)}
   .idx-no{flex:0 0 auto;width:30px;height:30px;border-radius:8px;background:var(--panel2);
     color:var(--accent);font-family:var(--serif);font-size:15px;font-weight:700;
     display:inline-flex;align-items:center;justify-content:center;transition:all .2s var(--ease)}
@@ -353,17 +371,38 @@
 
   @media(max-width:680px){
     .actor-cols{grid-template-columns:1fr}
+    .news-grid{grid-template-columns:1fr 1fr}
     .step-tag{flex-basis:100px}
     .hd-title{font-size:23px}
     .macro-arrow{flex-basis:100%;height:20px;transform:rotate(90deg)}
     .viewbar{margin-left:0;width:100%;justify-content:space-between}
   }
+/* 地方落实 · 政策雷达：与 .detail / .steps-details 同族的卡片内模块设计语言 */
+.local-impl{padding:0}
+.local-impl > .li-body{padding:14px 18px}
+.li-hd{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--accent);background:rgba(210,105,30,.12);padding:12px 16px;border-bottom:1px solid var(--accent-line);margin-bottom:0;font-family:var(--sans);letter-spacing:.3px}
+.li-hd-regions{display:flex;gap:4px;flex-wrap:wrap;margin-left:auto}
+.li-hd-region{font-size:10px;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:1px 8px;border-radius:10px;border:1px solid var(--accent-line);white-space:nowrap;letter-spacing:normal;text-transform:none}
+.li-hd-region-empty{color:var(--txt3);background:transparent;border-color:var(--line);opacity:.6}
+.li-node{display:flex;flex-direction:column;gap:3px;padding:9px 14px;margin-bottom:7px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--panel)}
+.li-node:last-child{margin-bottom:0}
+.li-node.li-weak{opacity:.72}
+.li-node.li-board{background:rgba(35,38,43,.02);border-style:dashed}
+.li-board .li-tier{color:var(--txt3)}
+.li-top{display:flex;gap:8px;align-items:center;margin-bottom:2px;flex-wrap:wrap}
+.li-region{font-size:11px;font-weight:700;color:#b5790f;background:rgba(181,121,15,.10);padding:1px 7px;border-radius:6px}
+.li-tier{font-size:11.5px;font-weight:600;color:#b5790f}
+.li-weak .li-tier{color:var(--txt3)}
+.li-arrow{font-size:11px;color:var(--txt3)}
+.li-title{display:block;font-size:13px;color:var(--txt);text-decoration:none;font-weight:600;line-height:1.4}
+.li-title:hover{color:var(--accent)}
+.li-meta{font-size:11px;color:var(--txt3);margin:1px 0}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="hd">
-    <div class="hd-title"><span class="dot"></span>时政新闻分析看板</div>
+    <div class="hd-title"><span class="dot"></span>政策脉络追踪看板</div>
     <div class="hd-sub">从碎片新闻 → 看清政策背后的完整大局 ｜ 钱袋子·权袋子 + 过程追踪六步法</div>
     <div class="hd-stats-row">
       <div class="hd-stats" id="stats"></div>
@@ -376,7 +415,7 @@
         <span class="vb-hint" id="vbHint"></span>
       </div>
     </div>
-    <div class="disclaimer"><b>● 实时数据</b><span>新闻由脚本每日自动抓取自 <b>中国政府网</b>，标题/日期/链接均为真实来源，点击「查看原文 ↗」直达政府网详情页。「六步法」标注为<b>规则版自动生成</b>（钱袋子/权袋子/制度/时间仅供参考，语义精度低于人工，可由每日 AI 任务精修）。</span></div>
+    <div class="disclaimer"><b>● 实时数据</b><span>新闻由脚本每日自动抓取自 <b>中国政府网</b>，标题/日期/链接均为真实来源，点击「查看原文 ↗」直达政府网详情页。「六步法」标注为规则版自动生成（钱袋子/权袋子/制度/时间仅供参考）。每日上午9:30更新。</span></div>
   </header>
 
   <div class="tabs" id="tabs"></div>
@@ -400,10 +439,6 @@
 
   <div class="cards" id="cards"></div>
 
-  <footer>
-    时政新闻分析看板 · 单文件原型 v1.2 ｜ 方法论依据：钱袋子/权袋子框架 + 过程追踪六步法<br>
-    第一层「民生影响域」解决"按领域找内容"，第二层「六步法常驻 Checklist」揭示政策落地机制
-  </footer>
 </div>
 
 <script id="app">
@@ -412,7 +447,7 @@
    存储设计 A：NEWS = 热库(news_data.json, 近30天) + 冷库(news_cold.json, >30天长线/未闭环) 合并。
    ⚠️ NEWS_DATA_START / NEWS_DATA_END 之间的内容会被脚本整体替换，请勿在其间手改。 */
 /* NEWS_DATA_START */
-/* 自动更新于 2026-07-16 09:20，共 84 条，来源：gov.cn 政策文件库官方检索接口 */
+/* 自动更新于 2026-07-16 20:58，共 84 条，来源：gov.cn 政策文件库官方检索接口 */
 const NEWS = [
   { id:"n1", title:"关于印发《生态环境监测“十五五”规划》的通知", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-16",
@@ -420,588 +455,588 @@ const NEWS = [
     lead_dept:"生态环境部", support_depts:["国家发展改革委"],
     actors:[{name:"生态环境部", role:"权袋子", action:"生态环境监测“十五五”规划"}, {name:"国家发展改革委", role:"权袋子", action:"生态环境监测“十五五”规划"}], rules:["生态环境监测“十五五”规划"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["环保"], primary_tag:"环保",
-    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7075670.htm", summary:"关于印发《生态环境监测“十五五”规划》的通知 环监测〔2026〕37号 各省、自治区、直辖市及新疆生产建设兵团生态环境厅（局）、发展改革委，生态环境部各流域(海域)生态环境监督管理局，各直属单位： 为...", doc_no:"环监测〔2026〕37号", pub_org:"生态环境部 国家发展改革委" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7075670.htm", summary:"关于印发《生态环境监测“十五五”规划》的通知 环监测〔2026〕37号 各省、自治区、直辖市及新疆生产建设兵团生态环境厅（局）、发展改革委，生态环境部各流域(海域)生态环境监督管理局，各直属单位： 为...", doc_no:"环监测〔2026〕37号", pub_org:"生态环境部 国家发展改革委", is_new:false },
   { id:"n2", title:"国务院办公厅关于转发生态环境部等部门《群众身边水体保护治理行动方案》的通知", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-14",
     story_line:"群众身边水体保护治理行动方案", stage:"细则落地", cross_dept:false,
     lead_dept:"国务院办公厅", support_depts:[],
     actors:[{name:"国务院办公厅", role:"权袋子", action:"群众身边水体保护治理行动方案"}], rules:["群众身边水体保护治理行动方案"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["环保"], primary_tag:"环保",
-    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7075365.htm", summary:"国务院办公厅关于转发生态环境部等部门 《群众身边水体保护治理行动方案》的通知 国办函〔2026〕65号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 生态环境部、国家发展改革委、工业和信息...", doc_no:"国办函〔2026〕65号", pub_org:"国务院办公厅" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7075365.htm", summary:"国务院办公厅关于转发生态环境部等部门 《群众身边水体保护治理行动方案》的通知 国办函〔2026〕65号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 生态环境部、国家发展改革委、工业和信息...", doc_no:"国办函〔2026〕65号", pub_org:"国务院办公厅", is_new:false },
   { id:"n3", title:"生态环境部等部门采取行动保护治理群众身边水环境", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-14",
     story_line:"生态环境部等部门采取行动保护治理群众身边水环境", stage:"公布执行", cross_dept:false,
     lead_dept:"生态环境部", support_depts:[],
     actors:[{name:"生态环境部", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["环保"], primary_tag:"环保",
-    link:"https://www.gov.cn/yaowen/liebiao/202607/content_7075406.htm", summary:"", doc_no:"", pub_org:"新华社" },
+    link:"https://www.gov.cn/yaowen/liebiao/202607/content_7075406.htm", summary:"", doc_no:"", pub_org:"新华社", is_new:false },
   { id:"n4", title:"关于印发《固体废物污染防治“十五五”规划》的通知", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-14",
     story_line:"固体废物污染防治\"十五五\"规划", stage:"公布执行", cross_dept:true,
     lead_dept:"生态环境部", support_depts:["国家发展改革委", "工业和信息化部", "住房城乡建设部", "农业农村部", "商务部"],
     actors:[{name:"生态环境部", role:"权袋子", action:"固体废物污染防治“十五五”规划"}, {name:"国家发展改革委", role:"权袋子", action:"固体废物污染防治“十五五”规划"}, {name:"工业和信息化部", role:"权袋子", action:"固体废物污染防治“十五五”规划"}, {name:"住房城乡建设部", role:"权袋子", action:"固体废物污染防治“十五五”规划"}, {name:"农业农村部", role:"权袋子", action:"固体废物污染防治“十五五”规划"}, {name:"商务部", role:"权袋子", action:"固体废物污染防治“十五五”规划"}], rules:["固体废物污染防治“十五五”规划"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["环保"], primary_tag:"环保",
-    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7075414.htm", summary:"关于印发《固体废物污染防治“十五五”规划》的通知 环固体〔2026〕39号 各省、自治区、直辖市及新疆生产建设兵团生态环境厅（局）、发展改革委、工业和信息化主管部门、住房城乡建设厅（委、管委、局）、农...", doc_no:"环固体〔2026〕39号", pub_org:"生态环境部 国家发展改革委 工业和信息化部 住房城乡建设部 农业农村部 商务部" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7075414.htm", summary:"关于印发《固体废物污染防治“十五五”规划》的通知 环固体〔2026〕39号 各省、自治区、直辖市及新疆生产建设兵团生态环境厅（局）、发展改革委、工业和信息化主管部门、住房城乡建设厅（委、管委、局）、农...", doc_no:"环固体〔2026〕39号", pub_org:"生态环境部 国家发展改革委 工业和信息化部 住房城乡建设部 农业农村部 商务部", is_new:false },
   { id:"n5", title:"国家卫生健康委 国家中医药管理局 国家疾病预防控制局关于进一步做好公立医疗卫生机构医用设备集中采购工作的通知", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-14",
     story_line:"国家卫生健康委 国家中医药管理局 国家疾病预防控制局关于进一步做好公立医疗卫生机构医用设备集中采购工作的通知", stage:"细则落地", cross_dept:true,
     lead_dept:"国家卫生健康委", support_depts:["国家中医药管理局", "国家疾病预防控制局"],
     actors:[{name:"国家卫生健康委", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家中医药管理局", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家疾病预防控制局", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["健康"], primary_tag:"健康",
-    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7075358.htm", summary:"国家卫生健康委 国家中医药管理局 国家疾病预防控制局关于进一步做好公立医疗卫生机构医用设备集中采购工作的通知 国卫财务函〔2026〕131号 各省、自治区、直辖市及新疆生产建设兵团卫生健康委、中医药局...", doc_no:"国卫财务函〔2026〕131号", pub_org:"国家卫生健康委 国家中医药局 国家疾控局" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7075358.htm", summary:"国家卫生健康委 国家中医药管理局 国家疾病预防控制局关于进一步做好公立医疗卫生机构医用设备集中采购工作的通知 国卫财务函〔2026〕131号 各省、自治区、直辖市及新疆生产建设兵团卫生健康委、中医药局...", doc_no:"国卫财务函〔2026〕131号", pub_org:"国家卫生健康委 国家中医药局 国家疾控局", is_new:false },
   { id:"n6", title:"四部门关于推动互联网基础资源高质量发展的指导意见", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-14",
     story_line:"四部门关于推动互联网基础资源高质量发展的指导意见", stage:"公布执行", cross_dept:true,
     lead_dept:"工业和信息化部", support_depts:["中央网信办", "国家发展改革委", "国家数据局"],
     actors:[{name:"工业和信息化部", role:"权袋子", action:"出规划/准入/标准"}, {name:"中央网信办", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家发展改革委", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家数据局", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["科技"], primary_tag:"科技",
-    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7075333.htm", summary:"工业和信息化部 中央网信办 国家发展和改革委 国家数据局关于推动互联网基础资源高质量发展的指导意见 工信部联信管〔2026〕159号 各省、自治区、直辖市通信管理局，各省、自治区、直辖市及计划单列市、...", doc_no:"工信部联信管〔2026〕159号", pub_org:"工业和信息化部 中央网信办 国家发展改革委 国家数据局" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7075333.htm", summary:"工业和信息化部 中央网信办 国家发展和改革委 国家数据局关于推动互联网基础资源高质量发展的指导意见 工信部联信管〔2026〕159号 各省、自治区、直辖市通信管理局，各省、自治区、直辖市及计划单列市、...", doc_no:"工信部联信管〔2026〕159号", pub_org:"工业和信息化部 中央网信办 国家发展改革委 国家数据局", is_new:false },
   { id:"n7", title:"国务院关于《扩大消费“十五五”规划》的批复", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-13",
     story_line:"扩大消费\"十五五\"规划", stage:"公布执行", cross_dept:false,
     lead_dept:"国务院", support_depts:[],
     actors:[{name:"国务院", role:"权袋子", action:"扩大消费“十五五”规划"}], rules:["扩大消费“十五五”规划"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["财政"], primary_tag:"财政",
-    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7075217.htm", summary:"国务院关于《扩大消费“十五五”规划》的批复 国函〔2026〕66号 国家发展改革委、商务部： 你们《关于报送〈扩大消费“十五五”规划〉（送审稿）的请示》（发改就业〔2026〕847号）收悉。现批复如下...", doc_no:"国函〔2026〕66号", pub_org:"国务院" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7075217.htm", summary:"国务院关于《扩大消费“十五五”规划》的批复 国函〔2026〕66号 国家发展改革委、商务部： 你们《关于报送〈扩大消费“十五五”规划〉（送审稿）的请示》（发改就业〔2026〕847号）收悉。现批复如下...", doc_no:"国函〔2026〕66号", pub_org:"国务院", is_new:false },
   { id:"n8", title:"国务院关于印发《国民健康“十五五”规划》的通知", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-13",
     story_line:"国民健康\"十五五\"规划", stage:"公布执行", cross_dept:false,
     lead_dept:"国务院", support_depts:[],
     actors:[{name:"国务院", role:"权袋子", action:"国民健康“十五五”规划"}], rules:["国民健康“十五五”规划"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["健康"], primary_tag:"健康",
-    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7075214.htm", summary:"国务院关于印发《国民健康 “十五五”规划》的通知 国发〔2026〕23号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 现将《国民健康“十五五”规划》印发给你们，请认真贯彻执行。 国务院 ...", doc_no:"国发〔2026〕23号", pub_org:"国务院" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7075214.htm", summary:"国务院关于印发《国民健康 “十五五”规划》的通知 国发〔2026〕23号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 现将《国民健康“十五五”规划》印发给你们，请认真贯彻执行。 国务院 ...", doc_no:"国发〔2026〕23号", pub_org:"国务院", is_new:false },
   { id:"n9", title:"2026世界人工智能大会暨人工智能全球治理高级别会议将于7月17日至20日在上海举行", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-13",
     story_line:"2026世界人工智能大会暨人工智能全球治理高级别会议将于7月17日至20日在上海举行", stage:"公布执行", cross_dept:false,
     lead_dept:"", support_depts:[],
     actors:[], rules:[], money_moved:false, power_moved:false,
     upstream:[], midstream:[], downstream:[], topic_tags:["科技"], primary_tag:"科技",
-    link:"https://www.gov.cn/yaowen/liebiao/202607/content_7075205.htm", summary:"", doc_no:"", pub_org:"外交部网站" },
+    link:"https://www.gov.cn/yaowen/liebiao/202607/content_7075205.htm", summary:"", doc_no:"", pub_org:"外交部网站", is_new:false },
   { id:"n10", title:"中共中央办公厅 国务院办公厅关于完善自然资源资产管理制度体系的意见", source:"中国政府网",
     issuer_level:"中办/国办", importance:"high", date_signed:null, date_published:"2026-07-13",
     story_line:"中共中央办公厅 国务院办公厅关于完善自然资源资产管理制度体系的意见", stage:"公布执行", cross_dept:true,
     lead_dept:"中共中央办公厅", support_depts:["中央办公厅", "国务院办公厅", "国务院"],
     actors:[{name:"中共中央办公厅", role:"权袋子", action:"出规划/准入/标准"}, {name:"中央办公厅", role:"权袋子", action:"出规划/准入/标准"}, {name:"国务院办公厅", role:"权袋子", action:"出规划/准入/标准"}, {name:"国务院", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["环保"], primary_tag:"环保",
-    link:"https://www.gov.cn/yaowen/liebiao/202607/content_7075233.htm", summary:"", doc_no:"", pub_org:"新华社" },
+    link:"https://www.gov.cn/yaowen/liebiao/202607/content_7075233.htm", summary:"", doc_no:"", pub_org:"新华社", is_new:false },
   { id:"n11", title:"解读 | 这份规划，为“十五五”国民健康绘就“路线图”", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-13",
     story_line:"国民健康\"十五五\"规划", stage:"公布执行", cross_dept:false,
     lead_dept:"", support_depts:[],
     actors:[], rules:[], money_moved:false, power_moved:false,
     upstream:[], midstream:[], downstream:[], topic_tags:["健康"], primary_tag:"健康",
-    link:"https://www.gov.cn/zhengce/202607/content_7075288.htm", summary:"", doc_no:"", pub_org:"新华社" },
+    link:"https://www.gov.cn/zhengce/202607/content_7075288.htm", summary:"", doc_no:"", pub_org:"新华社", is_new:false },
   { id:"n12", title:"国家发展改革委、商务部有关负责人就《扩大消费“十五五”规划》答问", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-13",
     story_line:"扩大消费\"十五五\"规划", stage:"公布执行", cross_dept:true,
     lead_dept:"国家发展改革委", support_depts:["商务部"],
     actors:[{name:"国家发展改革委", role:"权袋子", action:"扩大消费“十五五”规划"}, {name:"商务部", role:"权袋子", action:"扩大消费“十五五”规划"}], rules:["扩大消费“十五五”规划"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["财政"], primary_tag:"财政",
-    link:"https://www.gov.cn/zhengce/202607/content_7075286.htm", summary:"", doc_no:"", pub_org:"国家发展改革委网站" },
+    link:"https://www.gov.cn/zhengce/202607/content_7075286.htm", summary:"", doc_no:"", pub_org:"国家发展改革委网站", is_new:false },
   { id:"n13", title:"关于印发《康复辅助器具产业扩能提质三年行动方案（2026-2028年）》的通知", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-13",
     story_line:"康复辅助器具产业扩能提质三年行动方案（2026-2028年）", stage:"公布执行", cross_dept:false,
     lead_dept:"民政部", support_depts:[],
     actors:[{name:"民政部", role:"权袋子", action:"康复辅助器具产业扩能提质三年行动方案（2026-2028年）"}], rules:["康复辅助器具产业扩能提质三年行动方案（2026-2028年）"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["健康"], primary_tag:"健康",
-    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7075249.htm", summary:"关于印发《康复辅助器具产业扩能提质三年行动方案（2026-2028年）》的通知 民函〔2026〕48号 各省、自治区、直辖市及新疆生产建设兵团民政厅（局）、发展改革委、教育厅（局）、工业和信息化厅（局...", doc_no:"民函〔2026〕48号", pub_org:"民政部等" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7075249.htm", summary:"关于印发《康复辅助器具产业扩能提质三年行动方案（2026-2028年）》的通知 民函〔2026〕48号 各省、自治区、直辖市及新疆生产建设兵团民政厅（局）、发展改革委、教育厅（局）、工业和信息化厅（局...", doc_no:"民函〔2026〕48号", pub_org:"民政部等", is_new:false },
   { id:"n14", title:"解读 | 国务院常务会议进一步部署防汛抗洪救灾工作", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-11",
     story_line:"解读 | 国务院常务会议进一步部署防汛抗洪救灾工作", stage:"公布执行", cross_dept:false,
     lead_dept:"国务院", support_depts:[],
     actors:[{name:"国务院", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/zhengce/202607/content_7075043.htm", summary:"", doc_no:"", pub_org:"新华社" },
+    link:"https://www.gov.cn/zhengce/202607/content_7075043.htm", summary:"", doc_no:"", pub_org:"新华社", is_new:false },
   { id:"n15", title:"国务院关于《中医药振兴发展“十五五”规划》的批复", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-10",
     story_line:"中医药振兴发展\"十五五\"规划", stage:"公布执行", cross_dept:false,
     lead_dept:"国务院", support_depts:[],
     actors:[{name:"国务院", role:"权袋子", action:"中医药振兴发展“十五五”规划"}], rules:["中医药振兴发展“十五五”规划"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["健康"], primary_tag:"健康",
-    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074931.htm", summary:"国务院关于《中医药振兴发展 “十五五”规划》的批复 国函〔2026〕71号 国家卫生健康委、国家发展改革委、国家中医药局： 《国家卫生健康委、国家发展改革委关于报送〈中医药振兴发展“十五五”规划（送审...", doc_no:"国函〔2026〕71号", pub_org:"国务院" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074931.htm", summary:"国务院关于《中医药振兴发展 “十五五”规划》的批复 国函〔2026〕71号 国家卫生健康委、国家发展改革委、国家中医药局： 《国家卫生健康委、国家发展改革委关于报送〈中医药振兴发展“十五五”规划（送审...", doc_no:"国函〔2026〕71号", pub_org:"国务院", is_new:false },
   { id:"n16", title:"国家能源局关于印发《能源领域节能降碳行动计划（2026—2028年）》的通知", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-10",
     story_line:"能源领域节能降碳行动计划（2026—2028年）", stage:"公布执行", cross_dept:false,
     lead_dept:"国家能源局", support_depts:[],
     actors:[{name:"国家能源局", role:"权袋子", action:"能源领域节能降碳行动计划（2026—2028年）"}], rules:["能源领域节能降碳行动计划（2026—2028年）"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["能源"], primary_tag:"能源",
-    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074973.htm", summary:"国家能源局关于印发《能源领域节能降碳行动计划（2026—2028年）》的通知 国能发规划〔2026〕45号 各省（自治区、直辖市）能源局、有关省（自治区、直辖市）及新疆生产建设兵团发展改革委，北京市城...", doc_no:"国能发规划〔2026〕45号", pub_org:"国家能源局" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074973.htm", summary:"国家能源局关于印发《能源领域节能降碳行动计划（2026—2028年）》的通知 国能发规划〔2026〕45号 各省（自治区、直辖市）能源局、有关省（自治区、直辖市）及新疆生产建设兵团发展改革委，北京市城...", doc_no:"国能发规划〔2026〕45号", pub_org:"国家能源局", is_new:false },
   { id:"n17", title:"国家药品监督管理局公告（2026年第47号） 国家药监局关于发布药品试验数据保护实施办法的公告", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-10",
     story_line:"国家药品监督管理局公告（2026年第47号） 国家药监局关于发布药品试验数据保护实施办法的公告", stage:"公布执行", cross_dept:false,
     lead_dept:"国家药品监督管理局", support_depts:[],
     actors:[{name:"国家药品监督管理局", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["健康"], primary_tag:"健康",
-    link:"https://www.gov.cn/gongbao/2026/issue_12846/202607/content_7074807.html", summary:"国家药品监督管理局公告 2026 年 第 47 号 国家药监局关于发布药品试验数据 保护实施办法的公告 为促进药品创新发展，完善药品试验数据保护制度，根据《中华人民共和国药品管理法》、《中华人民共和国...", doc_no:"", pub_org:"国务院" },
+    link:"https://www.gov.cn/gongbao/2026/issue_12846/202607/content_7074807.html", summary:"国家药品监督管理局公告 2026 年 第 47 号 国家药监局关于发布药品试验数据 保护实施办法的公告 为促进药品创新发展，完善药品试验数据保护制度，根据《中华人民共和国药品管理法》、《中华人民共和国...", doc_no:"", pub_org:"国务院", is_new:false },
   { id:"n18", title:"中华人民共和国国务院任免人员", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-10",
     story_line:"中华人民共和国国务院任免人员", stage:"公布执行", cross_dept:false,
     lead_dept:"国务院", support_depts:[],
     actors:[], rules:[], money_moved:false, power_moved:false,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/gongbao/2026/issue_12846/202607/content_7074806.html", summary:"中华人民共和国国务院任免人员 2026年5月31日 蔡奇兼任国家行政学院院长，陈希不再担任国家行政学院院长职务。 免去王志勇的国家中医药管理局副局长职务。", doc_no:"", pub_org:"国务院" },
+    link:"https://www.gov.cn/gongbao/2026/issue_12846/202607/content_7074806.html", summary:"中华人民共和国国务院任免人员 2026年5月31日 蔡奇兼任国家行政学院院长，陈希不再担任国家行政学院院长职务。 免去王志勇的国家中医药管理局副局长职务。", doc_no:"", pub_org:"国务院", is_new:false },
   { id:"n19", title:"中华人民共和国民政部令（第82号） 社会组织评估管理办法", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-10",
     story_line:"中华人民共和国民政部令（第82号） 社会组织评估管理办法", stage:"细则落地", cross_dept:false,
     lead_dept:"民政部", support_depts:[],
     actors:[{name:"民政部", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/gongbao/2026/issue_12846/202607/content_7074811.html", summary:"社会组织评估管理办法 （2026年1月16日经民政部部务会议审议通过 2026年1月22日民政部令第82号公布 自2026年3月1日起施行） 第一章 总 则 第一条 为了规范社会组织评估工作，健全社...", doc_no:"", pub_org:"国务院" },
+    link:"https://www.gov.cn/gongbao/2026/issue_12846/202607/content_7074811.html", summary:"社会组织评估管理办法 （2026年1月16日经民政部部务会议审议通过 2026年1月22日民政部令第82号公布 自2026年3月1日起施行） 第一章 总 则 第一条 为了规范社会组织评估工作，健全社...", doc_no:"", pub_org:"国务院", is_new:false },
   { id:"n20", title:"国务院办公厅关于进一步完善大中型水库移民后期扶持政策的通知", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-10",
     story_line:"国务院办公厅关于进一步完善大中型水库移民后期扶持政策的通知", stage:"细则落地", cross_dept:true,
     lead_dept:"国务院办公厅", support_depts:["国务院"],
     actors:[{name:"国务院办公厅", role:"权袋子", action:"出规划/准入/标准"}, {name:"国务院", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/gongbao/2026/issue_12846/202607/content_7074812.html", summary:"国务院办公厅关于进一步完善 大中型水库移民后期扶持政策的通知 国办发〔2026〕20号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 根据《国务院关于完善大中型水库移民后期扶持政策的意...", doc_no:"", pub_org:"国务院" },
+    link:"https://www.gov.cn/gongbao/2026/issue_12846/202607/content_7074812.html", summary:"国务院办公厅关于进一步完善 大中型水库移民后期扶持政策的通知 国办发〔2026〕20号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 根据《国务院关于完善大中型水库移民后期扶持政策的意...", doc_no:"", pub_org:"国务院", is_new:false },
   { id:"n21", title:"中华人民共和国应急管理部令（第20号） 安全评价检测检验机构管理办法", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-10",
     story_line:"中华人民共和国应急管理部令（第20号） 安全评价检测检验机构管理办法", stage:"细则落地", cross_dept:false,
     lead_dept:"应急管理部", support_depts:[],
     actors:[{name:"应急管理部", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/gongbao/2026/issue_12846/202607/content_7074810.html", summary:"安全评价检测检验机构管理办法 （2019年3月20日应急管理部令第1号公布 2026年4月7日经应急管理部部务会议修订通过 2026年5月17日应急管理部令第20号公布 自2026年7月1日起施行） ...", doc_no:"", pub_org:"国务院" },
+    link:"https://www.gov.cn/gongbao/2026/issue_12846/202607/content_7074810.html", summary:"安全评价检测检验机构管理办法 （2019年3月20日应急管理部令第1号公布 2026年4月7日经应急管理部部务会议修订通过 2026年5月17日应急管理部令第20号公布 自2026年7月1日起施行） ...", doc_no:"", pub_org:"国务院", is_new:false },
   { id:"n22", title:"国家铁路局关于印发《铁路交通重大事故隐患判定标准》的通知 铁路交通重大事故隐患判定标准", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-10",
     story_line:"铁路交通重大事故隐患判定标准", stage:"公布执行", cross_dept:false,
     lead_dept:"国家铁路局", support_depts:[],
     actors:[{name:"国家铁路局", role:"权袋子", action:"铁路交通重大事故隐患判定标准"}], rules:["铁路交通重大事故隐患判定标准"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/gongbao/2026/issue_12846/202607/content_7074808.html", summary:"国家铁路局关于印发 《铁路交通重大事故隐患判定标准》的通知 国铁安监规〔2026〕17号 国铁集团、国家能源集团，中国中铁、中国铁建、中国中车、中国通号、中国物流，各地方铁路运输企业，各地区铁路监...", doc_no:"", pub_org:"国务院" },
+    link:"https://www.gov.cn/gongbao/2026/issue_12846/202607/content_7074808.html", summary:"国家铁路局关于印发 《铁路交通重大事故隐患判定标准》的通知 国铁安监规〔2026〕17号 国铁集团、国家能源集团，中国中铁、中国铁建、中国中车、中国通号、中国物流，各地方铁路运输企业，各地区铁路监...", doc_no:"", pub_org:"国务院", is_new:false },
   { id:"n23", title:"民政部 国家发展改革委 工业和信息化部 自然资源部 住房城乡建设部 农业农村部 国家 卫生健康委 广电总局 体育总局 中国残联 全国老龄办关于推进互助性养老服务发展的 意见", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-10",
     story_line:"民政部 国家发展改革委 工业和信息化部 自然资源部 住房城乡建设部 农业农村部 国家 卫生健康委 广电总局 体育总局 中国残联 全国老龄办关于推进互助性养老服务发展的 意见", stage:"公布执行", cross_dept:true,
     lead_dept:"民政部", support_depts:["国家发展改革委", "工业和信息化部", "自然资源部", "住房城乡建设部", "农业农村部", "体育总局"],
     actors:[{name:"民政部", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家发展改革委", role:"权袋子", action:"出规划/准入/标准"}, {name:"工业和信息化部", role:"权袋子", action:"出规划/准入/标准"}, {name:"自然资源部", role:"权袋子", action:"出规划/准入/标准"}, {name:"住房城乡建设部", role:"权袋子", action:"出规划/准入/标准"}, {name:"农业农村部", role:"权袋子", action:"出规划/准入/标准"}, {name:"体育总局", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["健康"], primary_tag:"健康",
-    link:"https://www.gov.cn/gongbao/2026/issue_12846/202607/content_7074809.html", summary:"民政部 国家发展改革委 工业和信息化部 自然资源部 住房城乡建设部 农业农村部 国家卫生健康委 广电总局 体育总局 中国残联 全国老龄办关于推进 互助性养老服务发展的意见 民发〔2026〕11号 ...", doc_no:"", pub_org:"国务院" },
+    link:"https://www.gov.cn/gongbao/2026/issue_12846/202607/content_7074809.html", summary:"民政部 国家发展改革委 工业和信息化部 自然资源部 住房城乡建设部 农业农村部 国家卫生健康委 广电总局 体育总局 中国残联 全国老龄办关于推进 互助性养老服务发展的意见 民发〔2026〕11号 ...", doc_no:"", pub_org:"国务院", is_new:false },
   { id:"n24", title:"中华人民共和国国务院令（第840号） 退役军人就业创业促进条例", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-10",
     story_line:"中华人民共和国国务院令（第840号） 退役军人就业创业促进条例", stage:"公布执行", cross_dept:false,
     lead_dept:"国务院", support_depts:[],
     actors:[{name:"国务院", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/gongbao/2026/issue_12846/202607/content_7074814.html", summary:"中华人民共和国国务院令 第 840 号 《退役军人就业创业促进条例》已经2026年6月5日国务院第88次常务会议通过，现予公布，自2026年8月1日起施行。 总 理 李 强 2026年6月...", doc_no:"", pub_org:"国务院" },
+    link:"https://www.gov.cn/gongbao/2026/issue_12846/202607/content_7074814.html", summary:"中华人民共和国国务院令 第 840 号 《退役军人就业创业促进条例》已经2026年6月5日国务院第88次常务会议通过，现予公布，自2026年8月1日起施行。 总 理 李 强 2026年6月...", doc_no:"", pub_org:"国务院", is_new:false },
   { id:"n25", title:"国务院关于印发《教育发展“十五五”规划》的通知 教育发展“十五五”规划", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-10",
     story_line:"教育发展\"十五五\"规划", stage:"公布执行", cross_dept:false,
     lead_dept:"国务院", support_depts:[],
     actors:[{name:"国务院", role:"权袋子", action:"教育发展“十五五”规划"}], rules:["教育发展“十五五”规划"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["教育"], primary_tag:"教育",
-    link:"https://www.gov.cn/gongbao/2026/issue_12846/202607/content_7074813.html", summary:"国务院关于印发《教育发展 “十五五”规划》的通知 国发〔2026〕19号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 现将《教育发展“十五五”规划》印发给你们，请认真贯彻执行。 国 ...", doc_no:"", pub_org:"国务院" },
+    link:"https://www.gov.cn/gongbao/2026/issue_12846/202607/content_7074813.html", summary:"国务院关于印发《教育发展 “十五五”规划》的通知 国发〔2026〕19号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 现将《教育发展“十五五”规划》印发给你们，请认真贯彻执行。 国 ...", doc_no:"", pub_org:"国务院", is_new:false },
   { id:"n26", title:"在庆祝中国共产党成立105周年大会上的讲话 …………………………………………………… 习近平", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-10",
     story_line:"在庆祝中国共产党成立105周年大会上的讲话 …………………………………………………… 习近平", stage:"公布执行", cross_dept:false,
     lead_dept:"国务院", support_depts:[],
     actors:[], rules:[], money_moved:false, power_moved:false,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/gongbao/2026/issue_12846/202607/content_7074815.html", summary:"在庆祝中国共产党成立105周年大会上的讲话 （2026年7月1日） 习近平 同志们，朋友们： 今天，我们隆重集会，庆祝中国共产党成立105周年，回顾我们党走过的光辉历程，展望党和人民事业发展的光明前景...", doc_no:"", pub_org:"国务院" },
+    link:"https://www.gov.cn/gongbao/2026/issue_12846/202607/content_7074815.html", summary:"在庆祝中国共产党成立105周年大会上的讲话 （2026年7月1日） 习近平 同志们，朋友们： 今天，我们隆重集会，庆祝中国共产党成立105周年，回顾我们党走过的光辉历程，展望党和人民事业发展的光明前景...", doc_no:"", pub_org:"国务院", is_new:false },
   { id:"n27", title:"国务院关于印发《“十五五”碳达峰行动方案》的通知", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-09",
     story_line:"\"十五五\"碳达峰行动方案", stage:"公布执行", cross_dept:false,
     lead_dept:"国务院", support_depts:[],
     actors:[{name:"国务院", role:"权袋子", action:"“十五五”碳达峰行动方案"}], rules:["“十五五”碳达峰行动方案"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["环保"], primary_tag:"环保",
-    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074827.htm", summary:"国务院关于印发《“十五五” 碳达峰行动方案》的通知 国发〔2026〕22号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 现将《“十五五”碳达峰行动方案》印发给你们，请认真贯彻执行。 国务...", doc_no:"国发〔2026〕22号", pub_org:"国务院" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074827.htm", summary:"国务院关于印发《“十五五” 碳达峰行动方案》的通知 国发〔2026〕22号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 现将《“十五五”碳达峰行动方案》印发给你们，请认真贯彻执行。 国务...", doc_no:"国发〔2026〕22号", pub_org:"国务院", is_new:false },
   { id:"n28", title:"关于印发国家基本药物目录（2026年版）的通知", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-09",
     story_line:"关于印发国家基本药物目录（2026年版）的通知", stage:"公布执行", cross_dept:true,
     lead_dept:"国家卫生健康委", support_depts:["国家中医药管理局", "国家疾病预防控制局"],
     actors:[{name:"国家卫生健康委", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家中医药管理局", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家疾病预防控制局", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["健康"], primary_tag:"健康",
-    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074868.htm", summary:"关于印发国家基本药物目录（2026年版）的通知 国卫药政发〔2026〕17号 各省、自治区、直辖市及新疆生产建设兵团卫生健康委、中医药局、疾控局： 为贯彻落实党中央、国务院决策部署，巩固完善国家基本药...", doc_no:"国卫药政发〔2026〕17号", pub_org:"国家卫生健康委 国家中医药局 国家疾控局" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074868.htm", summary:"关于印发国家基本药物目录（2026年版）的通知 国卫药政发〔2026〕17号 各省、自治区、直辖市及新疆生产建设兵团卫生健康委、中医药局、疾控局： 为贯彻落实党中央、国务院决策部署，巩固完善国家基本药...", doc_no:"国卫药政发〔2026〕17号", pub_org:"国家卫生健康委 国家中医药局 国家疾控局", is_new:false },
   { id:"n29", title:"商务部等9部门关于加快零售业创新发展的意见", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-09",
     story_line:"商务部等9部门关于加快零售业创新发展的意见", stage:"公布执行", cross_dept:true,
     lead_dept:"商务部", support_depts:["国家发展改革委", "司法部", "财政部", "人力资源社会保障部", "自然资源部", "住房城乡建设部", "文化和旅游部", "国家市场监督管理总局"],
     actors:[{name:"国家发展改革委", role:"钱袋子", action:"出资金/价格/税"}, {name:"财政部", role:"钱袋子", action:"出资金/价格/税"}, {name:"商务部", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家发展改革委", role:"权袋子", action:"出规划/准入/标准"}, {name:"司法部", role:"权袋子", action:"出规划/准入/标准"}, {name:"人力资源社会保障部", role:"权袋子", action:"出规划/准入/标准"}, {name:"自然资源部", role:"权袋子", action:"出规划/准入/标准"}, {name:"住房城乡建设部", role:"权袋子", action:"出规划/准入/标准"}, {name:"文化和旅游部", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家市场监督管理总局", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:true, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["财政"], primary_tag:"财政",
-    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074797.htm", summary:"商务部等9部门关于加快零售业创新发展的意见 商流通函〔2026〕306号 国家发展改革委、教育部、公安部、司法部、财政部、人力资源社会保障部、自然资源部、住房城乡建设部、商务部、文化和旅游部、中国人民...", doc_no:"商流通函〔2026〕306号", pub_org:"商务部 国家发展改革委 司法部 财政部 人力资源社会保障部 自然资源部 住房城乡建设部 文化和旅游部 市场监管总局" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074797.htm", summary:"商务部等9部门关于加快零售业创新发展的意见 商流通函〔2026〕306号 国家发展改革委、教育部、公安部、司法部、财政部、人力资源社会保障部、自然资源部、住房城乡建设部、商务部、文化和旅游部、中国人民...", doc_no:"商流通函〔2026〕306号", pub_org:"商务部 国家发展改革委 司法部 财政部 人力资源社会保障部 自然资源部 住房城乡建设部 文化和旅游部 市场监管总局", is_new:false },
   { id:"n30", title:"民政部发文加强城乡三级养老服务网络建设管理", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-08",
     story_line:"民政部发文加强城乡三级养老服务网络建设管理", stage:"公布执行", cross_dept:false,
     lead_dept:"民政部", support_depts:[],
     actors:[{name:"民政部", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["健康"], primary_tag:"健康",
-    link:"https://www.gov.cn/lianbo/202607/content_7074658.htm", summary:"", doc_no:"", pub_org:"新华社" },
+    link:"https://www.gov.cn/lianbo/202607/content_7074658.htm", summary:"", doc_no:"", pub_org:"新华社", is_new:false },
   { id:"n31", title:"国务院关于《疾病预防控制“十五五”规划》的批复", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-08",
     story_line:"疾病预防控制\"十五五\"规划", stage:"公布执行", cross_dept:false,
     lead_dept:"国务院", support_depts:[],
     actors:[{name:"国务院", role:"权袋子", action:"疾病预防控制“十五五”规划"}], rules:["疾病预防控制“十五五”规划"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["健康"], primary_tag:"健康",
-    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074675.htm", summary:"国务院关于《疾病预防控制 “十五五”规划》的批复 国函〔2026〕69号 国家卫生健康委、国家疾控局、国家发展改革委、财政部、农业农村部、海关总署、国家中医药局： 《国家卫生健康委关于报请审定〈疾病预...", doc_no:"国函〔2026〕69号", pub_org:"国务院" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074675.htm", summary:"国务院关于《疾病预防控制 “十五五”规划》的批复 国函〔2026〕69号 国家卫生健康委、国家疾控局、国家发展改革委、财政部、农业农村部、海关总署、国家中医药局： 《国家卫生健康委关于报请审定〈疾病预...", doc_no:"国函〔2026〕69号", pub_org:"国务院", is_new:false },
   { id:"n32", title:"关于加快推进“人工智能＋人社”应用发展的实施意见", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-08",
     story_line:"关于加快推进\"人工智能＋人社\"应用发展的实施意见", stage:"公布执行", cross_dept:true,
     lead_dept:"人力资源社会保障部", support_depts:["国家发展改革委", "工业和信息化部", "国家数据局"],
     actors:[{name:"人力资源社会保障部", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家发展改革委", role:"权袋子", action:"出规划/准入/标准"}, {name:"工业和信息化部", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家数据局", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["科技"], primary_tag:"科技",
-    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074732.htm", summary:"人力资源社会保障部 国家发展改革委 工业和信息化部 国家数据局关于加快推进“人工智能＋人社”应用发展的实施意见 人社部发〔2026〕40号 各省、自治区、直辖市及新疆生产建设兵团人力资源社会保障厅（局...", doc_no:"人社部发〔2026〕40号", pub_org:"人力资源社会保障部 国家发展改革委 工业和信息化部 国家数据局" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074732.htm", summary:"人力资源社会保障部 国家发展改革委 工业和信息化部 国家数据局关于加快推进“人工智能＋人社”应用发展的实施意见 人社部发〔2026〕40号 各省、自治区、直辖市及新疆生产建设兵团人力资源社会保障厅（局...", doc_no:"人社部发〔2026〕40号", pub_org:"人力资源社会保障部 国家发展改革委 工业和信息化部 国家数据局", is_new:false },
   { id:"n33", title:"民政部关于印发《城乡三级养老服务网络建设管理指引》的通知", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-08",
     story_line:"城乡三级养老服务网络建设管理指引", stage:"公布执行", cross_dept:false,
     lead_dept:"民政部", support_depts:[],
     actors:[{name:"民政部", role:"权袋子", action:"城乡三级养老服务网络建设管理指引"}], rules:["城乡三级养老服务网络建设管理指引"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["健康"], primary_tag:"健康",
-    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074664.htm", summary:"民政部关于印发《城乡三级养老服务网络建设管理指引》的通知 民函〔2026〕41号 各省、自治区、直辖市民政厅（局），新疆生产建设兵团民政局： 为贯彻落实《中共中央 国务院关于深化养老服务改革发展的意见...", doc_no:"民函〔2026〕41号", pub_org:"民政部" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074664.htm", summary:"民政部关于印发《城乡三级养老服务网络建设管理指引》的通知 民函〔2026〕41号 各省、自治区、直辖市民政厅（局），新疆生产建设兵团民政局： 为贯彻落实《中共中央 国务院关于深化养老服务改革发展的意见...", doc_no:"民函〔2026〕41号", pub_org:"民政部", is_new:false },
   { id:"n34", title:"文化和旅游部关于印发《旅游强国建设“十五五”规划》的通知", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-08",
     story_line:"旅游强国建设\"十五五\"规划", stage:"公布执行", cross_dept:false,
     lead_dept:"文化和旅游部", support_depts:[],
     actors:[{name:"文化和旅游部", role:"权袋子", action:"旅游强国建设“十五五”规划"}], rules:["旅游强国建设“十五五”规划"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074649.htm", summary:"文化和旅游部关于印发《旅游强国建设“十五五”规划》的通知 文旅资源发〔2026〕42号 各省、自治区、直辖市人民政府，新疆生产建设兵团，国务院各部委、各直属机构： 《旅游强国建设“十五五”规划》已经...", doc_no:"文旅资源发〔2026〕42号", pub_org:"文化和旅游部" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074649.htm", summary:"文化和旅游部关于印发《旅游强国建设“十五五”规划》的通知 文旅资源发〔2026〕42号 各省、自治区、直辖市人民政府，新疆生产建设兵团，国务院各部委、各直属机构： 《旅游强国建设“十五五”规划》已经...", doc_no:"文旅资源发〔2026〕42号", pub_org:"文化和旅游部", is_new:false },
   { id:"n35", title:"国务院关于《旅游强国建设“十五五”规划》的批复", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-07",
     story_line:"旅游强国建设\"十五五\"规划", stage:"公布执行", cross_dept:false,
     lead_dept:"国务院", support_depts:[],
     actors:[{name:"国务院", role:"权袋子", action:"旅游强国建设“十五五”规划"}], rules:["旅游强国建设“十五五”规划"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074517.htm", summary:"国务院关于《旅游强国建设 “十五五”规划》的批复 国函〔2026〕61号 文化和旅游部： 你部《关于呈报〈旅游强国建设“十五五”规划（送审稿）〉的请示》（文旅资源报〔2026〕38号）收悉。现批复如下...", doc_no:"国函〔2026〕61号", pub_org:"国务院" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074517.htm", summary:"国务院关于《旅游强国建设 “十五五”规划》的批复 国函〔2026〕61号 文化和旅游部： 你部《关于呈报〈旅游强国建设“十五五”规划（送审稿）〉的请示》（文旅资源报〔2026〕38号）收悉。现批复如下...", doc_no:"国函〔2026〕61号", pub_org:"国务院", is_new:false },
   { id:"n36", title:"今年\"两重\"建设项目清单全部下达 共安排8000亿元支持1417个重大项目", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-06",
     story_line:"今年\"两重\"建设项目清单全部下达 共安排8000亿元支持1417个重大项目", stage:"公布执行", cross_dept:false,
     lead_dept:"", support_depts:[],
     actors:[], rules:[], money_moved:false, power_moved:false,
     upstream:[], midstream:[], downstream:[], topic_tags:["财政"], primary_tag:"财政",
-    link:"https://www.gov.cn/yaowen/liebiao/202607/content_7074439.htm", summary:"", doc_no:"", pub_org:"央视网" },
+    link:"https://www.gov.cn/yaowen/liebiao/202607/content_7074439.htm", summary:"", doc_no:"", pub_org:"央视网", is_new:false },
   { id:"n37", title:"关于促进电影院多样化经营 繁荣发展电影院文化的通知", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-04",
     story_line:"关于促进电影院多样化经营 繁荣发展电影院文化的通知", stage:"细则落地", cross_dept:true,
     lead_dept:"国家电影局", support_depts:["国家市场监督管理总局"],
     actors:[{name:"国家电影局", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家市场监督管理总局", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074305.htm", summary:"关于促进电影院多样化经营 繁荣发展电影院文化的通知 国影发〔2026〕5号 各省、自治区、直辖市电影主管部门、市场监管局（厅、委）： 为贯彻落实党的二十届四中全会精神，以新需求引领新供给，以新供给创造...", doc_no:"国影发〔2026〕5号", pub_org:"国家电影局 市场监管总局" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074305.htm", summary:"关于促进电影院多样化经营 繁荣发展电影院文化的通知 国影发〔2026〕5号 各省、自治区、直辖市电影主管部门、市场监管局（厅、委）： 为贯彻落实党的二十届四中全会精神，以新需求引领新供给，以新供给创造...", doc_no:"国影发〔2026〕5号", pub_org:"国家电影局 市场监管总局", is_new:false },
   { id:"n38", title:"国务院关于印发《美丽中国建设“十五五”规划》的通知", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-03",
     story_line:"美丽中国建设\"十五五\"规划", stage:"公布执行", cross_dept:false,
     lead_dept:"国务院", support_depts:[],
     actors:[{name:"国务院", role:"权袋子", action:"美丽中国建设“十五五”规划"}], rules:["美丽中国建设“十五五”规划"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["环保"], primary_tag:"环保",
-    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074200.htm", summary:"国务院关于印发《美丽中国建设 “十五五”规划》的通知 国发〔2026〕20号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 现将《美丽中国建设“十五五”规划》印发给你们，请认真贯彻执行。 ...", doc_no:"国发〔2026〕20号", pub_org:"国务院" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074200.htm", summary:"国务院关于印发《美丽中国建设 “十五五”规划》的通知 国发〔2026〕20号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 现将《美丽中国建设“十五五”规划》印发给你们，请认真贯彻执行。 ...", doc_no:"国发〔2026〕20号", pub_org:"国务院", is_new:false },
   { id:"n39", title:"关于调整节能汽车、新能源汽车车船税优惠政策的公告", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-03",
     story_line:"关于调整节能汽车、新能源汽车车船税优惠政策的公告", stage:"公布执行", cross_dept:true,
     lead_dept:"财政部", support_depts:["国家税务总局", "工业和信息化部"],
     actors:[{name:"财政部", role:"钱袋子", action:"出资金/价格/税"}, {name:"国家税务总局", role:"钱袋子", action:"出资金/价格/税"}, {name:"工业和信息化部", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:true, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["汽车", "能源", "财政"], primary_tag:"汽车",
-    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074231.htm", summary:"关于调整节能汽车、新能源汽车车船税优惠政策的公告 财政部 税务总局 工业和信息化部公告2026年第19号 根据《中华人民共和国车船税法》及其实施条例有关规定，现就调整节能汽车、新能源汽车车船税优惠政...", doc_no:"财政部 税务总局 工业和信息化部公告2026年第19号", pub_org:"财政部 税务总局 工业和信息化部" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074231.htm", summary:"关于调整节能汽车、新能源汽车车船税优惠政策的公告 财政部 税务总局 工业和信息化部公告2026年第19号 根据《中华人民共和国车船税法》及其实施条例有关规定，现就调整节能汽车、新能源汽车车船税优惠政...", doc_no:"财政部 税务总局 工业和信息化部公告2026年第19号", pub_org:"财政部 税务总局 工业和信息化部", is_new:false },
   { id:"n40", title:"国家发展改革委 国家能源局关于印发《新型能源体系建设“十五五”规划》的通知", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-03",
     story_line:"新型能源体系建设\"十五五\"规划", stage:"公布执行", cross_dept:true,
     lead_dept:"国家发展改革委", support_depts:["国家能源局"],
     actors:[{name:"国家发展改革委", role:"权袋子", action:"新型能源体系建设“十五五”规划"}, {name:"国家能源局", role:"权袋子", action:"新型能源体系建设“十五五”规划"}], rules:["新型能源体系建设“十五五”规划"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["能源"], primary_tag:"能源",
-    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074220.htm", summary:"国家发展改革委 国家能源局关于印发《新型能源体系建设“十五五”规划》的通知 发改能源〔2026〕884号 各省、自治区、直辖市人民政府，国务院有关部委、直属机构，有关中央企业： 《新型能源体系建设“十...", doc_no:"发改能源〔2026〕884号", pub_org:"国家发展改革委 国家能源局" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074220.htm", summary:"国家发展改革委 国家能源局关于印发《新型能源体系建设“十五五”规划》的通知 发改能源〔2026〕884号 各省、自治区、直辖市人民政府，国务院有关部委、直属机构，有关中央企业： 《新型能源体系建设“十...", doc_no:"发改能源〔2026〕884号", pub_org:"国家发展改革委 国家能源局", is_new:false },
   { id:"n41", title:"国务院关于《残疾人保障和发展“十五五”规划》的批复", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-02",
     story_line:"残疾人保障和发展\"十五五\"规划", stage:"公布执行", cross_dept:false,
     lead_dept:"国务院", support_depts:[],
     actors:[{name:"国务院", role:"权袋子", action:"残疾人保障和发展“十五五”规划"}], rules:["残疾人保障和发展“十五五”规划"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074096.htm", summary:"国务院关于《残疾人保障和发展 “十五五”规划》的批复 国函〔2026〕60号 国务院残疾人工作委员会： 你委《关于报送〈残疾人保障和发展“十五五”规划（送审稿）〉的请示》（残工委发〔2026〕3号）收...", doc_no:"国函〔2026〕60号", pub_org:"国务院" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074096.htm", summary:"国务院关于《残疾人保障和发展 “十五五”规划》的批复 国函〔2026〕60号 国务院残疾人工作委员会： 你委《关于报送〈残疾人保障和发展“十五五”规划（送审稿）〉的请示》（残工委发〔2026〕3号）收...", doc_no:"国函〔2026〕60号", pub_org:"国务院", is_new:false },
   { id:"n42", title:"国务院关于《体育强国建设“十五五”规划》的批复", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-02",
     story_line:"体育强国建设\"十五五\"规划", stage:"公布执行", cross_dept:false,
     lead_dept:"国务院", support_depts:[],
     actors:[{name:"国务院", role:"权袋子", action:"体育强国建设“十五五”规划"}], rules:["体育强国建设“十五五”规划"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074093.htm", summary:"国务院关于《体育强国建设 “十五五”规划》的批复 国函〔2026〕59号 体育总局： 你局《关于报请审定〈体育强国建设“十五五”规划（送审稿）〉的请示》（体政字〔2026〕137号）收悉。现批复如下：...", doc_no:"国函〔2026〕59号", pub_org:"国务院" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074093.htm", summary:"国务院关于《体育强国建设 “十五五”规划》的批复 国函〔2026〕59号 体育总局： 你局《关于报请审定〈体育强国建设“十五五”规划（送审稿）〉的请示》（体政字〔2026〕137号）收悉。现批复如下：...", doc_no:"国函〔2026〕59号", pub_org:"国务院", is_new:false },
   { id:"n43", title:"国务院关于同意在上海市设立上海辰山国家植物园的批复", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-07-02",
     story_line:"国务院关于同意在上海市设立上海辰山国家植物园的批复", stage:"公布执行", cross_dept:false,
     lead_dept:"国务院", support_depts:[],
     actors:[{name:"国务院", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074091.htm", summary:"国务院关于同意在上海市 设立上海辰山国家植物园的批复 国函〔2026〕58号 上海市人民政府，自然资源部、住房城乡建设部、中国科学院、国家林草局： 《自然资源部、住房城乡建设部、中国科学院、上海市人民...", doc_no:"国函〔2026〕58号", pub_org:"国务院" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074091.htm", summary:"国务院关于同意在上海市 设立上海辰山国家植物园的批复 国函〔2026〕58号 上海市人民政府，自然资源部、住房城乡建设部、中国科学院、国家林草局： 《自然资源部、住房城乡建设部、中国科学院、上海市人民...", doc_no:"国函〔2026〕58号", pub_org:"国务院", is_new:false },
   { id:"n44", title:"人力资源社会保障部 教育部 财政部 国家税务总局关于失业保险支持企业稳岗扩岗的通知", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-02",
     story_line:"人力资源社会保障部 教育部 财政部 国家税务总局关于失业保险支持企业稳岗扩岗的通知", stage:"细则落地", cross_dept:true,
     lead_dept:"人力资源社会保障部", support_depts:["教育部", "财政部", "国家税务总局"],
     actors:[{name:"财政部", role:"钱袋子", action:"出资金/价格/税"}, {name:"国家税务总局", role:"钱袋子", action:"出资金/价格/税"}, {name:"人力资源社会保障部", role:"权袋子", action:"出规划/准入/标准"}, {name:"教育部", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:true, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["财政", "教育"], primary_tag:"财政",
-    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074139.htm", summary:"人力资源社会保障部 教育部 财政部 国家税务总局关于失业保险支持企业稳岗扩岗的通知 人社部发〔2026〕39号 各省、自治区、直辖市人民政府，新疆生产建设兵团： 为贯彻落实党中央、国务院有关决策部署，...", doc_no:"人社部发〔2026〕39号", pub_org:"人力资源社会保障部 教育部 财政部 国家税务总局" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074139.htm", summary:"人力资源社会保障部 教育部 财政部 国家税务总局关于失业保险支持企业稳岗扩岗的通知 人社部发〔2026〕39号 各省、自治区、直辖市人民政府，新疆生产建设兵团： 为贯彻落实党中央、国务院有关决策部署，...", doc_no:"人社部发〔2026〕39号", pub_org:"人力资源社会保障部 教育部 财政部 国家税务总局", is_new:false },
   { id:"n45", title:"关于完善现代化都市圈综合交通运输体系的指导意见", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-02",
     story_line:"关于完善现代化都市圈综合交通运输体系的指导意见", stage:"公布执行", cross_dept:false,
     lead_dept:"交通运输部", support_depts:[],
     actors:[{name:"交通运输部", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074075.htm", summary:"交通运输部 国家发展改革委 公安部 财政部 自然资源部 住房城乡建设部 国家铁路局 中国民用航空局 国家邮政局 中国国家铁路集团有限公司关于完善现代化都市圈综合交通运输体系的指导意见 交规划发〔202...", doc_no:"交规划发〔2026〕64号", pub_org:"交通运输部等" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7074075.htm", summary:"交通运输部 国家发展改革委 公安部 财政部 自然资源部 住房城乡建设部 国家铁路局 中国民用航空局 国家邮政局 中国国家铁路集团有限公司关于完善现代化都市圈综合交通运输体系的指导意见 交规划发〔202...", doc_no:"交规划发〔2026〕64号", pub_org:"交通运输部等", is_new:false },
   { id:"n46", title:"工业和信息化部等八部门印发《关于推动工业互联网高质量发展的实施意见》的通知", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-07-01",
     story_line:"关于推动工业互联网高质量发展的实施意见", stage:"公布执行", cross_dept:true,
     lead_dept:"工业和信息化部", support_depts:["国家发展改革委", "人力资源社会保障部", "应急管理部", "中国人民银行", "国务院国资委", "国家市场监督管理总局", "中国证监会"],
     actors:[{name:"工业和信息化部", role:"权袋子", action:"关于推动工业互联网高质量发展的实施意见"}, {name:"国家发展改革委", role:"权袋子", action:"关于推动工业互联网高质量发展的实施意见"}, {name:"人力资源社会保障部", role:"权袋子", action:"关于推动工业互联网高质量发展的实施意见"}, {name:"应急管理部", role:"权袋子", action:"关于推动工业互联网高质量发展的实施意见"}, {name:"中国人民银行", role:"权袋子", action:"关于推动工业互联网高质量发展的实施意见"}, {name:"国家市场监督管理总局", role:"权袋子", action:"关于推动工业互联网高质量发展的实施意见"}, {name:"中国证监会", role:"权袋子", action:"关于推动工业互联网高质量发展的实施意见"}], rules:["关于推动工业互联网高质量发展的实施意见"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["科技"], primary_tag:"科技",
-    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7073906.htm", summary:"工业和信息化部等八部门印发《关于推动工业互联网高质量发展的实施意见》的通知 工信部联信管〔2026〕152号 各省、自治区、直辖市及计划单列市、新疆生产建设兵团工业和信息化、发展改革委、人力资源社会保...", doc_no:"工信部联信管〔2026〕152号", pub_org:"工业和信息化部 国家发展改革委 人力资源社会保障部 应急管理部 中国人民银行 国务院国资委 市场监管总局 中国证监会" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202607/content_7073906.htm", summary:"工业和信息化部等八部门印发《关于推动工业互联网高质量发展的实施意见》的通知 工信部联信管〔2026〕152号 各省、自治区、直辖市及计划单列市、新疆生产建设兵团工业和信息化、发展改革委、人力资源社会保...", doc_no:"工信部联信管〔2026〕152号", pub_org:"工业和信息化部 国家发展改革委 人力资源社会保障部 应急管理部 中国人民银行 国务院国资委 市场监管总局 中国证监会", is_new:false },
   { id:"n47", title:"退役军人就业创业促进条例", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-30",
     story_line:"退役军人就业创业促进条例", stage:"公布执行", cross_dept:false,
     lead_dept:"国务院", support_depts:[],
     actors:[{name:"国务院", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7073789.htm", summary:"中华人民共和国国务院令 第840号 《退役军人就业创业促进条例》已经2026年6月5日国务院第88次常务会议通过，现予公布，自2026年8月1日起施行。 总理 李强 2026年6月...", doc_no:"国令第840号", pub_org:"国务院" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7073789.htm", summary:"中华人民共和国国务院令 第840号 《退役军人就业创业促进条例》已经2026年6月5日国务院第88次常务会议通过，现予公布，自2026年8月1日起施行。 总理 李强 2026年6月...", doc_no:"国令第840号", pub_org:"国务院", is_new:false },
   { id:"n48", title:"国务院关于浙江、福建、山东等3省国家级自然保护区和国家级风景名胜区整合优化方案的批复", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-30",
     story_line:"国务院关于浙江、福建、山东等3省国家级自然保护区和国家级风景名胜区整合优化方案的批复", stage:"公布执行", cross_dept:false,
     lead_dept:"国务院", support_depts:[],
     actors:[{name:"国务院", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["环保"], primary_tag:"环保",
-    link:"https://www.gov.cn/gongbao/2026/issue_12826/202606/content_7073636.html", summary:"国务院关于浙江、福建、山东等3省 国家级自然保护区和国家级风景名胜区 整合优化方案的批复 国函〔2026〕53号 自然资源部、生态环境部、国家林草局： 《自然资源部、生态环境部关于报请批准浙江、福...", doc_no:"", pub_org:"国务院" },
+    link:"https://www.gov.cn/gongbao/2026/issue_12826/202606/content_7073636.html", summary:"国务院关于浙江、福建、山东等3省 国家级自然保护区和国家级风景名胜区 整合优化方案的批复 国函〔2026〕53号 自然资源部、生态环境部、国家林草局： 《自然资源部、生态环境部关于报请批准浙江、福...", doc_no:"", pub_org:"国务院", is_new:false },
   { id:"n49", title:"国家药品监督管理局 中华人民共和国公安部 中华人民共和国国家卫生健康委员会 国家市 场监督管理总局 国家医疗保障局 国家中医药管理局 国家疾病预防控制局公告（2026年 第42号） 国家药监局 公安部 国家卫生健康委 市场监管总局 国家医保局 国家中医药局 国家 疾控局关于发布《医药代表管理办法》的公告", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-30",
     story_line:"医药代表管理办法", stage:"公布执行", cross_dept:true,
     lead_dept:"国家药品监督管理局", support_depts:["公安部", "国家卫生健康委", "国家医疗保障局", "国家中医药管理局", "国家疾病预防控制局", "国家市场监督管理总局"],
     actors:[{name:"国家药品监督管理局", role:"权袋子", action:"医药代表管理办法"}, {name:"公安部", role:"权袋子", action:"医药代表管理办法"}, {name:"国家卫生健康委", role:"权袋子", action:"医药代表管理办法"}, {name:"国家中医药管理局", role:"权袋子", action:"医药代表管理办法"}, {name:"国家疾病预防控制局", role:"权袋子", action:"医药代表管理办法"}, {name:"国家市场监督管理总局", role:"权袋子", action:"医药代表管理办法"}], rules:["医药代表管理办法"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["健康"], primary_tag:"健康",
-    link:"https://www.gov.cn/gongbao/2026/issue_12826/202606/content_7073631.html", summary:"2026 年 第 42 号 国家药监局 公安部 国家卫生健康委 市场监管总局 国家医保局 国家中医药局 国家疾控局关于发布《医药代表管理办法》的公告 为规范医药代表学术推广行为，进一步加强医药代表管理...", doc_no:"", pub_org:"国务院" },
+    link:"https://www.gov.cn/gongbao/2026/issue_12826/202606/content_7073631.html", summary:"2026 年 第 42 号 国家药监局 公安部 国家卫生健康委 市场监管总局 国家医保局 国家中医药局 国家疾控局关于发布《医药代表管理办法》的公告 为规范医药代表学术推广行为，进一步加强医药代表管理...", doc_no:"", pub_org:"国务院", is_new:false },
   { id:"n50", title:"人力资源社会保障部 国家发展改革委 工业和信息化部 农业农村部关于实施创业模式引领 行动的通知", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-30",
     story_line:"人力资源社会保障部 国家发展改革委 工业和信息化部 农业农村部关于实施创业模式引领 行动的通知", stage:"细则落地", cross_dept:true,
     lead_dept:"人力资源社会保障部", support_depts:["国家发展改革委", "工业和信息化部", "农业农村部"],
     actors:[{name:"人力资源社会保障部", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家发展改革委", role:"权袋子", action:"出规划/准入/标准"}, {name:"工业和信息化部", role:"权袋子", action:"出规划/准入/标准"}, {name:"农业农村部", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/gongbao/2026/issue_12826/202606/content_7073632.html", summary:"人力资源社会保障部 国家发展改革委 工业和信息化部 农业农村部关于实施创业模式引领行动的通知 人社部发〔2026〕30号 各省、自治区、直辖市及新疆生产建设兵团人力资源社会保障厅（局）、发展改革委...", doc_no:"", pub_org:"国务院" },
+    link:"https://www.gov.cn/gongbao/2026/issue_12826/202606/content_7073632.html", summary:"人力资源社会保障部 国家发展改革委 工业和信息化部 农业农村部关于实施创业模式引领行动的通知 人社部发〔2026〕30号 各省、自治区、直辖市及新疆生产建设兵团人力资源社会保障厅（局）、发展改革委...", doc_no:"", pub_org:"国务院", is_new:false },
   { id:"n51", title:"国家互联网信息办公室 中华人民共和国工业和信息化部 中华人民共和国公安部 中华人民 共和国交通运输部 中华人民共和国商务部 中国人民银行 中华人民共和国海关总署 国家 税务总局 国家市场监督管理总局 国家金融监督管理总局令（第22号） 促进和规范电子单证应用规定", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-30",
     story_line:"国家互联网信息办公室 中华人民共和国工业和信息化部 中华人民共和国公安部 中华人民 共和国交通运输部 中华人民共和国商务部 中国人民银行 中华人民共和国海关总署 国家 税务总局 国家市场监督管理总局 国家金融监督管理总局令（第22号） 促进和规范电子单证应用规定", stage:"细则落地", cross_dept:true,
     lead_dept:"国家互联网信息办公室", support_depts:["工业和信息化部", "公安部", "交通运输部", "商务部", "中国人民银行", "海关总署", "国家税务总局", "国家市场监督管理总局", "国家金融监督管理总局"],
     actors:[{name:"中国人民银行", role:"钱袋子", action:"出资金/价格/税"}, {name:"国家税务总局", role:"钱袋子", action:"出资金/价格/税"}, {name:"国家金融监督管理总局", role:"钱袋子", action:"出资金/价格/税"}, {name:"国家互联网信息办公室", role:"权袋子", action:"出规划/准入/标准"}, {name:"工业和信息化部", role:"权袋子", action:"出规划/准入/标准"}, {name:"公安部", role:"权袋子", action:"出规划/准入/标准"}, {name:"交通运输部", role:"权袋子", action:"出规划/准入/标准"}, {name:"商务部", role:"权袋子", action:"出规划/准入/标准"}, {name:"中国人民银行", role:"权袋子", action:"出规划/准入/标准"}, {name:"海关总署", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家市场监督管理总局", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家金融监督管理总局", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:true, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["科技", "财政"], primary_tag:"科技",
-    link:"https://www.gov.cn/gongbao/2026/issue_12826/202606/content_7073633.html", summary:"促进和规范电子单证应用规定 （2026年2月10日经国家网信办室务会会议审议通过，并经工业和信息化部、公安部、交通运输部、商务部、中国人民银行、海关总署、税务总局、市场监管总局、金融监管总局同意 20...", doc_no:"", pub_org:"国务院" },
+    link:"https://www.gov.cn/gongbao/2026/issue_12826/202606/content_7073633.html", summary:"促进和规范电子单证应用规定 （2026年2月10日经国家网信办室务会会议审议通过，并经工业和信息化部、公安部、交通运输部、商务部、中国人民银行、海关总署、税务总局、市场监管总局、金融监管总局同意 20...", doc_no:"", pub_org:"国务院", is_new:false },
   { id:"n52", title:"国务院关于印发《实施就业优先战略“十五五”规划》的通知 实施就业优先战略“十五五”规划", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-30",
     story_line:"实施就业优先战略\"十五五\"规划", stage:"公布执行", cross_dept:false,
     lead_dept:"国务院", support_depts:[],
     actors:[{name:"国务院", role:"权袋子", action:"实施就业优先战略“十五五”规划"}], rules:["实施就业优先战略“十五五”规划"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/gongbao/2026/issue_12826/202606/content_7073637.html", summary:"国务院关于印发《实施就业优先战略 “十五五”规划》的通知 国发〔2026〕16号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 现将《实施就业优先战略“十五五”规划》印发给你们，请认真...", doc_no:"", pub_org:"国务院" },
+    link:"https://www.gov.cn/gongbao/2026/issue_12826/202606/content_7073637.html", summary:"国务院关于印发《实施就业优先战略 “十五五”规划》的通知 国发〔2026〕16号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 现将《实施就业优先战略“十五五”规划》印发给你们，请认真...", doc_no:"", pub_org:"国务院", is_new:false },
   { id:"n53", title:"在第十七届夏季达沃斯论坛开幕式上的致辞 ………………………… 中华人民共和国国务院总理 李强", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-30",
     story_line:"在第十七届夏季达沃斯论坛开幕式上的致辞 ………………………… 中华人民共和国国务院总理 李强", stage:"公布执行", cross_dept:false,
     lead_dept:"国务院", support_depts:[],
     actors:[], rules:[], money_moved:false, power_moved:false,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/gongbao/2026/issue_12826/202606/content_7073638.html", summary:"在第十七届夏季达沃斯论坛开幕式上的致辞 （2026年6月24日，大连） 中华人民共和国国务院总理 李 强 尊敬的霍夫曼共同主席、茨温吉总裁， 尊敬的各国领导人， 尊敬的各位国际组织负责人， 尊敬的各位...", doc_no:"", pub_org:"国务院" },
+    link:"https://www.gov.cn/gongbao/2026/issue_12826/202606/content_7073638.html", summary:"在第十七届夏季达沃斯论坛开幕式上的致辞 （2026年6月24日，大连） 中华人民共和国国务院总理 李 强 尊敬的霍夫曼共同主席、茨温吉总裁， 尊敬的各国领导人， 尊敬的各位国际组织负责人， 尊敬的各位...", doc_no:"", pub_org:"国务院", is_new:false },
   { id:"n54", title:"中国证券监督管理委员会令（第234号） 衍生品交易监督管理办法（试行）", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-30",
     story_line:"中国证券监督管理委员会令（第234号） 衍生品交易监督管理办法（试行）", stage:"细则落地", cross_dept:false,
     lead_dept:"国务院", support_depts:[],
     actors:[{name:"国务院", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["财政"], primary_tag:"财政",
-    link:"https://www.gov.cn/gongbao/2026/issue_12826/202606/content_7073634.html", summary:"衍生品交易监督管理办法（试行） （2026年5月13日经中国证监会委务会议审议通过 2026年5月14日中国证监会令第234号公布 自2026年11月16日起施行） 第一章 总 则 第一条 为了规范...", doc_no:"", pub_org:"国务院" },
+    link:"https://www.gov.cn/gongbao/2026/issue_12826/202606/content_7073634.html", summary:"衍生品交易监督管理办法（试行） （2026年5月13日经中国证监会委务会议审议通过 2026年5月14日中国证监会令第234号公布 自2026年11月16日起施行） 第一章 总 则 第一条 为了规范...", doc_no:"", pub_org:"国务院", is_new:false },
   { id:"n55", title:"中华人民共和国交通运输部令（2026年第10号） 公共航空运输企业经营许可规定", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-30",
     story_line:"中华人民共和国交通运输部令（2026年第10号） 公共航空运输企业经营许可规定", stage:"细则落地", cross_dept:false,
     lead_dept:"交通运输部", support_depts:[],
     actors:[{name:"交通运输部", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/gongbao/2026/issue_12826/202606/content_7073635.html", summary:"公共航空运输企业经营许可规定 （2026年5月22日经交通运输部部务会议通过 2026年5月27日交通运输部令2026年第10号公布 自2026年7月1日起施行） 第一章 总 则 第一条 为了实施公...", doc_no:"", pub_org:"国务院" },
+    link:"https://www.gov.cn/gongbao/2026/issue_12826/202606/content_7073635.html", summary:"公共航空运输企业经营许可规定 （2026年5月22日经交通运输部部务会议通过 2026年5月27日交通运输部令2026年第10号公布 自2026年7月1日起施行） 第一章 总 则 第一条 为了实施公...", doc_no:"", pub_org:"国务院", is_new:false },
   { id:"n56", title:"国务院关于印发《教育发展“十五五”规划》的通知", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-29",
     story_line:"教育发展\"十五五\"规划", stage:"公布执行", cross_dept:false,
     lead_dept:"国务院", support_depts:[],
     actors:[{name:"国务院", role:"权袋子", action:"教育发展“十五五”规划"}], rules:["教育发展“十五五”规划"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["教育"], primary_tag:"教育",
-    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7073641.htm", summary:"国务院关于印发《教育发展 “十五五”规划》的通知 国发〔2026〕19号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 现将《教育发展“十五五”规划》印发给你们，请认真贯彻执行。 国务院 ...", doc_no:"国发〔2026〕19号", pub_org:"国务院" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7073641.htm", summary:"国务院关于印发《教育发展 “十五五”规划》的通知 国发〔2026〕19号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 现将《教育发展“十五五”规划》印发给你们，请认真贯彻执行。 国务院 ...", doc_no:"国发〔2026〕19号", pub_org:"国务院", is_new:false },
   { id:"n57", title:"民政部 人力资源社会保障部关于印发《养老服务师职业资格制度暂行规定》的通知", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-06-26",
     story_line:"养老服务师职业资格制度暂行规定", stage:"公布执行", cross_dept:true,
     lead_dept:"民政部", support_depts:["人力资源社会保障部"],
     actors:[{name:"民政部", role:"权袋子", action:"养老服务师职业资格制度暂行规定"}, {name:"人力资源社会保障部", role:"权袋子", action:"养老服务师职业资格制度暂行规定"}], rules:["养老服务师职业资格制度暂行规定"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["健康"], primary_tag:"健康",
-    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7073378.htm", summary:"民政部 人力资源社会保障部关于印发《养老服务师职业资格制度暂行规定》的通知 民发〔2026〕25号 各省、自治区、直辖市民政厅（局）、人力资源社会保障厅（局），新疆生产建设兵团民政局、人力资源社会保障...", doc_no:"民发〔2026〕25号", pub_org:"民政部 人力资源社会保障部" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7073378.htm", summary:"民政部 人力资源社会保障部关于印发《养老服务师职业资格制度暂行规定》的通知 民发〔2026〕25号 各省、自治区、直辖市民政厅（局）、人力资源社会保障厅（局），新疆生产建设兵团民政局、人力资源社会保障...", doc_no:"民发〔2026〕25号", pub_org:"民政部 人力资源社会保障部", is_new:false },
   { id:"n58", title:"国务院办公厅关于进一步完善大中型水库移民后期扶持政策的通知", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-25",
     story_line:"国务院办公厅关于进一步完善大中型水库移民后期扶持政策的通知", stage:"细则落地", cross_dept:false,
     lead_dept:"国务院办公厅", support_depts:[],
     actors:[{name:"国务院办公厅", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7073260.htm", summary:"国务院办公厅关于进一步完善 大中型水库移民后期扶持政策的通知 国办发〔2026〕20号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 根据《国务院关于完善大中型水库移民后期扶持政策的意见》...", doc_no:"国办发〔2026〕20号", pub_org:"国务院办公厅" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7073260.htm", summary:"国务院办公厅关于进一步完善 大中型水库移民后期扶持政策的通知 国办发〔2026〕20号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 根据《国务院关于完善大中型水库移民后期扶持政策的意见》...", doc_no:"国办发〔2026〕20号", pub_org:"国务院办公厅", is_new:false },
   { id:"n59", title:"关于印发《新型能源体系建设“十五五”规划》的通知", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-06-25",
     story_line:"新型能源体系建设\"十五五\"规划", stage:"公布执行", cross_dept:true,
     lead_dept:"国家发展改革委", support_depts:["国家能源局"],
     actors:[{name:"国家发展改革委", role:"权袋子", action:"新型能源体系建设“十五五”规划"}, {name:"国家能源局", role:"权袋子", action:"新型能源体系建设“十五五”规划"}], rules:["新型能源体系建设“十五五”规划"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["能源"], primary_tag:"能源",
-    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7073322.htm", summary:"国家发展改革委 国家能源局关于印发《新型能源体系建设“十五五”规划》的通知 发改能源〔2026〕884号 各省、自治区、直辖市人民政府，国务院有关部委、直属机构，有关中央企业： 《新型能源体系建设“十...", doc_no:"发改能源〔2026〕884号", pub_org:"国家发展改革委 国家能源局" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7073322.htm", summary:"国家发展改革委 国家能源局关于印发《新型能源体系建设“十五五”规划》的通知 发改能源〔2026〕884号 各省、自治区、直辖市人民政府，国务院有关部委、直属机构，有关中央企业： 《新型能源体系建设“十...", doc_no:"发改能源〔2026〕884号", pub_org:"国家发展改革委 国家能源局", is_new:false },
   { id:"n60", title:"关于印发《美丽中国建设全民行动促进计划（2026-2030年）》的通知", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-06-25",
     story_line:"美丽中国建设全民行动促进计划（2026-2030年）", stage:"公布执行", cross_dept:true,
     lead_dept:"生态环境部", support_depts:["中央宣传部", "中央社会工作部", "教育部", "共青团中央", "全国妇联"],
     actors:[{name:"生态环境部", role:"权袋子", action:"美丽中国建设全民行动促进计划（2026-2030年）"}, {name:"中央宣传部", role:"权袋子", action:"美丽中国建设全民行动促进计划（2026-2030年）"}, {name:"中央社会工作部", role:"权袋子", action:"美丽中国建设全民行动促进计划（2026-2030年）"}, {name:"教育部", role:"权袋子", action:"美丽中国建设全民行动促进计划（2026-2030年）"}], rules:["美丽中国建设全民行动促进计划（2026-2030年）"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["环保"], primary_tag:"环保",
-    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7073286.htm", summary:"关于印发《美丽中国建设全民行动促进计划（2026-2030年）》的通知 环宣教〔2026〕35号 各省、自治区、直辖市及新疆生产建设兵团生态环境厅（局）、党委宣传部、党委社会工作部、教育厅（教委、教育...", doc_no:"环宣教〔2026〕35号", pub_org:"生态环境部 中央宣传部 中央社会工作部 教育部 共青团中央 全国妇联" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7073286.htm", summary:"关于印发《美丽中国建设全民行动促进计划（2026-2030年）》的通知 环宣教〔2026〕35号 各省、自治区、直辖市及新疆生产建设兵团生态环境厅（局）、党委宣传部、党委社会工作部、教育厅（教委、教育...", doc_no:"环宣教〔2026〕35号", pub_org:"生态环境部 中央宣传部 中央社会工作部 教育部 共青团中央 全国妇联", is_new:false },
   { id:"n61", title:"商务部等8部门办公厅关于公布汽车流通消费改革试点城市名单的通知", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-06-23",
     story_line:"商务部等8部门办公厅关于公布汽车流通消费改革试点城市名单的通知", stage:"公布执行", cross_dept:true,
     lead_dept:"商务部", support_depts:["国家发展改革委", "工业和信息化部", "公安部", "交通运输部", "文化和旅游部", "海关总署", "体育总局"],
     actors:[{name:"商务部", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家发展改革委", role:"权袋子", action:"出规划/准入/标准"}, {name:"工业和信息化部", role:"权袋子", action:"出规划/准入/标准"}, {name:"公安部", role:"权袋子", action:"出规划/准入/标准"}, {name:"交通运输部", role:"权袋子", action:"出规划/准入/标准"}, {name:"文化和旅游部", role:"权袋子", action:"出规划/准入/标准"}, {name:"海关总署", role:"权袋子", action:"出规划/准入/标准"}, {name:"体育总局", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["汽车", "财政"], primary_tag:"汽车",
-    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7073062.htm", summary:"商务部等8部门办公厅关于公布汽车流通消费改革试点城市名单的通知 商办消费函2026年第345号 为深入贯彻落实党中央、国务院决策部署，加快清理汽车流通消费不合理限制，全链条扩大汽车消费，按照《商务部等...", doc_no:"商办消费函2026年第345号", pub_org:"商务部办公厅 国家发展改革委办公厅 工业和信息化部办公厅 公安部办公厅 交通运输部办公厅 文化和旅游部办公厅 海关总署办公厅 体育总局办公厅" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7073062.htm", summary:"商务部等8部门办公厅关于公布汽车流通消费改革试点城市名单的通知 商办消费函2026年第345号 为深入贯彻落实党中央、国务院决策部署，加快清理汽车流通消费不合理限制，全链条扩大汽车消费，按照《商务部等...", doc_no:"商办消费函2026年第345号", pub_org:"商务部办公厅 国家发展改革委办公厅 工业和信息化部办公厅 公安部办公厅 交通运输部办公厅 文化和旅游部办公厅 海关总署办公厅 体育总局办公厅", is_new:false },
   { id:"n62", title:"商务部等9部门关于培育壮大汽车后市场消费若干措施的通知", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-06-23",
     story_line:"商务部等9部门关于培育壮大汽车后市场消费若干措施的通知", stage:"细则落地", cross_dept:true,
     lead_dept:"商务部", support_depts:["工业和信息化部", "公安部", "交通运输部", "文化和旅游部", "海关总署", "国家市场监督管理总局", "国家金融监督管理总局", "体育总局"],
     actors:[{name:"商务部", role:"权袋子", action:"出规划/准入/标准"}, {name:"工业和信息化部", role:"权袋子", action:"出规划/准入/标准"}, {name:"公安部", role:"权袋子", action:"出规划/准入/标准"}, {name:"交通运输部", role:"权袋子", action:"出规划/准入/标准"}, {name:"文化和旅游部", role:"权袋子", action:"出规划/准入/标准"}, {name:"海关总署", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家市场监督管理总局", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家金融监督管理总局", role:"权袋子", action:"出规划/准入/标准"}, {name:"体育总局", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["汽车", "财政"], primary_tag:"汽车",
-    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7073060.htm", summary:"商务部等9部门关于培育壮大汽车后市场消费若干措施的通知 商消费函2026年第145号 为贯彻落实国务院办公厅《加快培育服务消费新增长点工作方案》部署要求，破除汽车后市场领域不合理限制措施，培育新业态，...", doc_no:"商消费函2026年第145号", pub_org:"商务部 工业和信息化部 公安部 交通运输部 文化和旅游部 海关总署 市场监管总局 金融监管总局 体育总局" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7073060.htm", summary:"商务部等9部门关于培育壮大汽车后市场消费若干措施的通知 商消费函2026年第145号 为贯彻落实国务院办公厅《加快培育服务消费新增长点工作方案》部署要求，破除汽车后市场领域不合理限制措施，培育新业态，...", doc_no:"商消费函2026年第145号", pub_org:"商务部 工业和信息化部 公安部 交通运输部 文化和旅游部 海关总署 市场监管总局 金融监管总局 体育总局", is_new:false },
   { id:"n63", title:"商务部 国家发展改革委 财政部关于印发《利用外资固稳促优行动方案》的通知", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-06-22",
     story_line:"利用外资固稳促优行动方案", stage:"公布执行", cross_dept:true,
     lead_dept:"商务部", support_depts:["国家发展改革委", "财政部"],
     actors:[{name:"国家发展改革委", role:"钱袋子", action:"利用外资固稳促优行动方案"}, {name:"财政部", role:"钱袋子", action:"利用外资固稳促优行动方案"}, {name:"商务部", role:"权袋子", action:"利用外资固稳促优行动方案"}, {name:"国家发展改革委", role:"权袋子", action:"利用外资固稳促优行动方案"}], rules:["利用外资固稳促优行动方案"], money_moved:true, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["财政"], primary_tag:"财政",
-    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7072838.htm", summary:"商务部 国家发展改革委 财政部关于印发《利用外资固稳促优行动方案》的通知 商资发〔2026〕97号 各省、自治区、直辖市人民政府，新疆生产建设兵团，国务院有关部门： 经国务院同意，现将《利用外资固稳促...", doc_no:"商资发〔2026〕97号", pub_org:"商务部 国家发展改革委 财政部" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7072838.htm", summary:"商务部 国家发展改革委 财政部关于印发《利用外资固稳促优行动方案》的通知 商资发〔2026〕97号 各省、自治区、直辖市人民政府，新疆生产建设兵团，国务院有关部门： 经国务院同意，现将《利用外资固稳促...", doc_no:"商资发〔2026〕97号", pub_org:"商务部 国家发展改革委 财政部", is_new:false },
   { id:"n64", title:"国务院关于印发《加快农业农村现代化“十五五”规划》的通知 加快农业农村现代化“十五五”规划", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-20",
     story_line:"加快农业农村现代化\"十五五\"规划", stage:"公布执行", cross_dept:false,
     lead_dept:"国务院", support_depts:[],
     actors:[{name:"国务院", role:"权袋子", action:"加快农业农村现代化“十五五”规划"}], rules:["加快农业农村现代化“十五五”规划"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072477.html", summary:"国务院关于印发《加快农业农村现代化 “十五五”规划》的通知 国发〔2026〕14号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 现将《加快农业农村现代化“十五五”规划》印发给你们，请...", doc_no:"", pub_org:"国务院" },
+    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072477.html", summary:"国务院关于印发《加快农业农村现代化 “十五五”规划》的通知 国发〔2026〕14号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 现将《加快农业农村现代化“十五五”规划》印发给你们，请...", doc_no:"", pub_org:"国务院", is_new:false },
   { id:"n65", title:"中国人民银行 中华人民共和国工业和信息化部 国家市场监督管理总局 国家金融监督管理 总局 中国证券监督管理委员会 国家知识产权局 国家互联网信息办公室 国家外汇管理局 公告(〔2026〕第9号) 金融产品网络营销管理办法", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-20",
     story_line:"中国人民银行 中华人民共和国工业和信息化部 国家市场监督管理总局 国家金融监督管理 总局 中国证券监督管理委员会 国家知识产权局 国家互联网信息办公室 国家外汇管理局 公告(〔2026〕第9号) 金融产品网络营销管理办法", stage:"细则落地", cross_dept:true,
     lead_dept:"中国人民银行", support_depts:["工业和信息化部", "国家市场监督管理总局", "国家知识产权局", "国家互联网信息办公室", "国家外汇管理局"],
     actors:[{name:"中国人民银行", role:"钱袋子", action:"出资金/价格/税"}, {name:"国家外汇管理局", role:"钱袋子", action:"出资金/价格/税"}, {name:"中国人民银行", role:"权袋子", action:"出规划/准入/标准"}, {name:"工业和信息化部", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家市场监督管理总局", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家知识产权局", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家互联网信息办公室", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:true, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["财政", "科技"], primary_tag:"财政",
-    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072469.html", summary:"公 告 〔2026〕第 9 号 为规范金融产品网络营销活动，保障金融消费者和投资者合法权益，促进互联网金融业务健康有序发展，中国人民银行、工业和信息化部、市场监管总局、金融监管总局、中国证监会、国家...", doc_no:"", pub_org:"国务院" },
+    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072469.html", summary:"公 告 〔2026〕第 9 号 为规范金融产品网络营销活动，保障金融消费者和投资者合法权益，促进互联网金融业务健康有序发展，中国人民银行、工业和信息化部、市场监管总局、金融监管总局、中国证监会、国家...", doc_no:"", pub_org:"国务院", is_new:false },
   { id:"n66", title:"国务院办公厅关于加强监管防范风险促进私募投资基金高质量发展的指导意见", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-20",
     story_line:"国务院办公厅关于加强监管防范风险促进私募投资基金高质量发展的指导意见", stage:"公布执行", cross_dept:true,
     lead_dept:"国务院办公厅", support_depts:["国务院"],
     actors:[{name:"国务院办公厅", role:"权袋子", action:"出规划/准入/标准"}, {name:"国务院", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["财政"], primary_tag:"财政",
-    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072475.html", summary:"国务院办公厅关于加强监管防范风险 促进私募投资基金高质量发展的指导意见 国办函〔2026〕54号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 为做好私募投资基金（以下简称私募基金）加...", doc_no:"", pub_org:"国务院" },
+    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072475.html", summary:"国务院办公厅关于加强监管防范风险 促进私募投资基金高质量发展的指导意见 国办函〔2026〕54号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 为做好私募投资基金（以下简称私募基金）加...", doc_no:"", pub_org:"国务院", is_new:false },
   { id:"n67", title:"中国人民银行令（〔2026〕第4号） 中国人民银行关于修改部分规章的决定", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-20",
     story_line:"中国人民银行令（〔2026〕第4号） 中国人民银行关于修改部分规章的决定", stage:"公布执行", cross_dept:false,
     lead_dept:"中国人民银行", support_depts:[],
     actors:[{name:"中国人民银行", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["财政"], primary_tag:"财政",
-    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072474.html", summary:"中国人民银行关于修改部分规章的决定 （经中国人民银行行务会议审议通过 2026年5月15日中国人民银行令〔2026〕第4号公布 自2026年7月1日起实施） 为加强金融法治建设，根据市场发展实际完善银...", doc_no:"", pub_org:"国务院" },
+    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072474.html", summary:"中国人民银行关于修改部分规章的决定 （经中国人民银行行务会议审议通过 2026年5月15日中国人民银行令〔2026〕第4号公布 自2026年7月1日起实施） 为加强金融法治建设，根据市场发展实际完善银...", doc_no:"", pub_org:"国务院", is_new:false },
   { id:"n68", title:"国务院关于印发《现代化应急体系建设“十五五”规划》的通知 现代化应急体系建设“十五五”规划", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-20",
     story_line:"现代化应急体系建设\"十五五\"规划", stage:"公布执行", cross_dept:false,
     lead_dept:"国务院", support_depts:[],
     actors:[{name:"国务院", role:"权袋子", action:"现代化应急体系建设“十五五”规划"}], rules:["现代化应急体系建设“十五五”规划"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072476.html", summary:"国务院关于印发《现代化应急体系建设 “十五五”规划》的通知 国发〔2026〕15号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 现将《现代化应急体系建设“十五五”规划》印发给你们，请...", doc_no:"", pub_org:"国务院" },
+    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072476.html", summary:"国务院关于印发《现代化应急体系建设 “十五五”规划》的通知 国发〔2026〕15号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 现将《现代化应急体系建设“十五五”规划》印发给你们，请...", doc_no:"", pub_org:"国务院", is_new:false },
   { id:"n69", title:"水利部 国家发展改革委 财政部 生态环境部 农业农村部 国家疾控局关于进一步加强农村 供水工程运行管护工作的通知", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-20",
     story_line:"水利部 国家发展改革委 财政部 生态环境部 农业农村部 国家疾控局关于进一步加强农村 供水工程运行管护工作的通知", stage:"细则落地", cross_dept:true,
     lead_dept:"水利部", support_depts:["国家发展改革委", "财政部", "生态环境部", "农业农村部", "国家疾病预防控制局"],
     actors:[{name:"国家发展改革委", role:"钱袋子", action:"出资金/价格/税"}, {name:"财政部", role:"钱袋子", action:"出资金/价格/税"}, {name:"水利部", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家发展改革委", role:"权袋子", action:"出规划/准入/标准"}, {name:"生态环境部", role:"权袋子", action:"出规划/准入/标准"}, {name:"农业农村部", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家疾病预防控制局", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:true, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["环保", "财政"], primary_tag:"环保",
-    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072470.html", summary:"水利部 国家发展改革委 财政部 生态环境部 农业农村部 国家疾控局关于进一步加强 农村供水工程运行管护工作的通知 水农〔2026〕47号 各省、自治区、直辖市和新疆生产建设兵团水利（水务）厅（局）...", doc_no:"", pub_org:"国务院" },
+    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072470.html", summary:"水利部 国家发展改革委 财政部 生态环境部 农业农村部 国家疾控局关于进一步加强 农村供水工程运行管护工作的通知 水农〔2026〕47号 各省、自治区、直辖市和新疆生产建设兵团水利（水务）厅（局）...", doc_no:"", pub_org:"国务院", is_new:false },
   { id:"n70", title:"国家互联网信息办公室 中华人民共和国国家发展和改革委员会 中华人民共和国工业和 信息化部 中华人民共和国公安部 国家市场监督管理总局令（第21号） 人工智能拟人化互动服务管理暂行办法", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-20",
     story_line:"国家互联网信息办公室 中华人民共和国国家发展和改革委员会 中华人民共和国工业和 信息化部 中华人民共和国公安部 国家市场监督管理总局令（第21号） 人工智能拟人化互动服务管理暂行办法", stage:"细则落地", cross_dept:true,
     lead_dept:"国家互联网信息办公室", support_depts:["国家发展改革委", "公安部", "国家市场监督管理总局"],
     actors:[{name:"国家互联网信息办公室", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家发展改革委", role:"权袋子", action:"出规划/准入/标准"}, {name:"公安部", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家市场监督管理总局", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["科技"], primary_tag:"科技",
-    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072472.html", summary:"人工智能拟人化互动服务管理暂行办法 （2026年2月2日经国家网信办室务会会议审议通过，并经国家发展改革委、工业和信息化部、公安部、市场监管总局同意 2026年4月10日国家网信办、国家发展改革委、工...", doc_no:"", pub_org:"国务院" },
+    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072472.html", summary:"人工智能拟人化互动服务管理暂行办法 （2026年2月2日经国家网信办室务会会议审议通过，并经国家发展改革委、工业和信息化部、公安部、市场监管总局同意 2026年4月10日国家网信办、国家发展改革委、工...", doc_no:"", pub_org:"国务院", is_new:false },
   { id:"n71", title:"国家金融监督管理总局 中国人民银行公告（金规〔2026〕2 号） 个人贷款业务明示综合融资成本规定", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-20",
     story_line:"国家金融监督管理总局 中国人民银行公告（金规〔2026〕2 号） 个人贷款业务明示综合融资成本规定", stage:"细则落地", cross_dept:true,
     lead_dept:"国家金融监督管理总局", support_depts:["中国人民银行"],
     actors:[{name:"国家金融监督管理总局", role:"钱袋子", action:"出资金/价格/税"}, {name:"中国人民银行", role:"钱袋子", action:"出资金/价格/税"}, {name:"国家金融监督管理总局", role:"权袋子", action:"出规划/准入/标准"}, {name:"中国人民银行", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:true, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["财政"], primary_tag:"财政",
-    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072468.html", summary:"公 告 金 规〔2026〕 2 号 为维护个人贷款市场秩序，保护金融消费者合法权益，提升金融服务质效，国家金融监督管理总局会同中国人民银行制定了《个人贷款业务明示综合融资成本规定》，现予发布。 金融...", doc_no:"", pub_org:"国务院" },
+    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072468.html", summary:"公 告 金 规〔2026〕 2 号 为维护个人贷款市场秩序，保护金融消费者合法权益，提升金融服务质效，国家金融监督管理总局会同中国人民银行制定了《个人贷款业务明示综合融资成本规定》，现予发布。 金融...", doc_no:"", pub_org:"国务院", is_new:false },
   { id:"n72", title:"中华人民共和国国务院任免人员", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-20",
     story_line:"中华人民共和国国务院任免人员", stage:"公布执行", cross_dept:false,
     lead_dept:"国务院", support_depts:[],
     actors:[], rules:[], money_moved:false, power_moved:false,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072467.html", summary:"中华人民共和国国务院任免人员 2026年5月28日 任命刘苏社为文化和旅游部副部长，免去其国家发展和改革委员会副主任职务。 任命洪宗明为退役军人事务部副部长，免去马飞雄的退役军人事务部副部长职务。 任...", doc_no:"", pub_org:"国务院" },
+    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072467.html", summary:"中华人民共和国国务院任免人员 2026年5月28日 任命刘苏社为文化和旅游部副部长，免去其国家发展和改革委员会副主任职务。 任命洪宗明为退役军人事务部副部长，免去马飞雄的退役军人事务部副部长职务。 任...", doc_no:"", pub_org:"国务院", is_new:false },
   { id:"n73", title:"国家保密局令（2026年第1号） 国家秘密鉴定工作规定", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-20",
     story_line:"国家保密局令（2026年第1号） 国家秘密鉴定工作规定", stage:"细则落地", cross_dept:false,
     lead_dept:"国务院", support_depts:[],
     actors:[{name:"国务院", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072471.html", summary:"国家秘密鉴定工作规定 （2021年7月30日国家保密局令2021年第1号公布 2026年4月4日国家保密局令2026年第1号修订 自2026年6月1日起施行） 第一章 总 则 第一条 为了规范国家秘...", doc_no:"", pub_org:"国务院" },
+    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072471.html", summary:"国家秘密鉴定工作规定 （2021年7月30日国家保密局令2021年第1号公布 2026年4月4日国家保密局令2026年第1号修订 自2026年6月1日起施行） 第一章 总 则 第一条 为了规范国家秘...", doc_no:"", pub_org:"国务院", is_new:false },
   { id:"n74", title:"习近平在朝鲜媒体发表署名文章 继往开来、砥砺同行 续写中朝传统友谊崭新篇章", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-20",
     story_line:"习近平在朝鲜媒体发表署名文章 继往开来、砥砺同行 续写中朝传统友谊崭新篇章", stage:"公布执行", cross_dept:false,
     lead_dept:"国务院", support_depts:[],
     actors:[], rules:[], money_moved:false, power_moved:false,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072478.html", summary:"习近平在朝鲜媒体发表署名文章 继往开来、砥砺同行 续写中朝传统友谊崭新篇章 6月8日，在赴平壤对朝鲜民主主义人民共和国进行国事访问之际，中共中央总书记、国家主席习近平在朝鲜《劳动新闻》发表题为《继往开...", doc_no:"", pub_org:"国务院" },
+    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072478.html", summary:"习近平在朝鲜媒体发表署名文章 继往开来、砥砺同行 续写中朝传统友谊崭新篇章 6月8日，在赴平壤对朝鲜民主主义人民共和国进行国事访问之际，中共中央总书记、国家主席习近平在朝鲜《劳动新闻》发表题为《继往开...", doc_no:"", pub_org:"国务院", is_new:false },
   { id:"n75", title:"国家宗教事务局令（第24号） 藏传佛教学衔授予办法", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-20",
     story_line:"国家宗教事务局令（第24号） 藏传佛教学衔授予办法", stage:"细则落地", cross_dept:false,
     lead_dept:"国务院", support_depts:[],
     actors:[{name:"国务院", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072473.html", summary:"藏传佛教学衔授予办法 （2026年3月30日经国家宗教局按规定程序审议通过 2026年4月10日国家宗教局令第24号公布 自2026年5月10日起施行） 第一章 总 则 第一条 为规范藏传佛教学衔授...", doc_no:"", pub_org:"国务院" },
+    link:"https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072473.html", summary:"藏传佛教学衔授予办法 （2026年3月30日经国家宗教局按规定程序审议通过 2026年4月10日国家宗教局令第24号公布 自2026年5月10日起施行） 第一章 总 则 第一条 为规范藏传佛教学衔授...", doc_no:"", pub_org:"国务院", is_new:false },
   { id:"n76", title:"工业和信息化部等七部门关于印发《促进平台经济大中小企业协同发展行动方案（2026—2028年）》的通知", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-06-18",
     story_line:"促进平台经济大中小企业协同发展行动方案（2026—2028年）", stage:"公布执行", cross_dept:true,
     lead_dept:"工业和信息化部", support_depts:["中央网信办", "国家发展改革委", "科技部", "商务部", "国家市场监督管理总局", "国家数据局"],
     actors:[{name:"工业和信息化部", role:"权袋子", action:"促进平台经济大中小企业协同发展行动方案（2026—2028年）"}, {name:"中央网信办", role:"权袋子", action:"促进平台经济大中小企业协同发展行动方案（2026—2028年）"}, {name:"国家发展改革委", role:"权袋子", action:"促进平台经济大中小企业协同发展行动方案（2026—2028年）"}, {name:"科技部", role:"权袋子", action:"促进平台经济大中小企业协同发展行动方案（2026—2028年）"}, {name:"商务部", role:"权袋子", action:"促进平台经济大中小企业协同发展行动方案（2026—2028年）"}, {name:"国家市场监督管理总局", role:"权袋子", action:"促进平台经济大中小企业协同发展行动方案（2026—2028年）"}, {name:"国家数据局", role:"权袋子", action:"促进平台经济大中小企业协同发展行动方案（2026—2028年）"}], rules:["促进平台经济大中小企业协同发展行动方案（2026—2028年）"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["科技"], primary_tag:"科技",
-    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7072741.htm", summary:"工业和信息化部等七部门关于印发《促进平台经济大中小企业协同发展行动方案（2026—2028年）》的通知 工信部联信管〔2026〕119号 各省，自治区，直辖市通信管理局，各省，自治区，直辖市及计划单列...", doc_no:"工信部联信管〔2026〕119号", pub_org:"工业和信息化部 中央网信办 国家发展改革委 科技部 商务部 市场监管总局 国家数据局" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7072741.htm", summary:"工业和信息化部等七部门关于印发《促进平台经济大中小企业协同发展行动方案（2026—2028年）》的通知 工信部联信管〔2026〕119号 各省，自治区，直辖市通信管理局，各省，自治区，直辖市及计划单列...", doc_no:"工信部联信管〔2026〕119号", pub_org:"工业和信息化部 中央网信办 国家发展改革委 科技部 商务部 市场监管总局 国家数据局", is_new:false },
   { id:"n77", title:"商务部等8部门关于加快“人工智能+消费”发展的实施意见", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-06-18",
     story_line:"商务部等8部门关于加快\"人工智能+消费\"发展的实施意见", stage:"公布执行", cross_dept:true,
     lead_dept:"商务部", support_depts:["中央网信办", "国家发展改革委", "教育部", "工业和信息化部", "民政部", "住房城乡建设部", "文化和旅游部"],
     actors:[{name:"国家发展改革委", role:"钱袋子", action:"出资金/价格/税"}, {name:"商务部", role:"权袋子", action:"出规划/准入/标准"}, {name:"中央网信办", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家发展改革委", role:"权袋子", action:"出规划/准入/标准"}, {name:"教育部", role:"权袋子", action:"出规划/准入/标准"}, {name:"工业和信息化部", role:"权袋子", action:"出规划/准入/标准"}, {name:"民政部", role:"权袋子", action:"出规划/准入/标准"}, {name:"住房城乡建设部", role:"权袋子", action:"出规划/准入/标准"}, {name:"文化和旅游部", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:true, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["科技", "财政"], primary_tag:"科技",
-    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7072672.htm", summary:"商务部等8部门关于加快“人工智能+消费”发展的实施意见 商建发2026年第89号 为贯彻落实《国务院关于深入实施“人工智能+”行动的意见》和《中共中央办公厅 国务院办公厅关于印发〈提振消费专项行动方案...", doc_no:"商建发2026年第89号", pub_org:"商务部 中央网信办 国家发展改革委 教育部 工业和信息化部 民政部 住房城乡建设部 文化和旅游部" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7072672.htm", summary:"商务部等8部门关于加快“人工智能+消费”发展的实施意见 商建发2026年第89号 为贯彻落实《国务院关于深入实施“人工智能+”行动的意见》和《中共中央办公厅 国务院办公厅关于印发〈提振消费专项行动方案...", doc_no:"商建发2026年第89号", pub_org:"商务部 中央网信办 国家发展改革委 教育部 工业和信息化部 民政部 住房城乡建设部 文化和旅游部", is_new:false },
   { id:"n78", title:"国务院关于浙江、福建、山东等3省国家级自然保护区和国家级风景名胜区整合优化方案的批复", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-17",
     story_line:"国务院关于浙江、福建、山东等3省国家级自然保护区和国家级风景名胜区整合优化方案的批复", stage:"公布执行", cross_dept:false,
     lead_dept:"国务院", support_depts:[],
     actors:[{name:"国务院", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["环保"], primary_tag:"环保",
-    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7072484.htm", summary:"国务院关于浙江、福建、山东等3省 国家级自然保护区和国家级风景名胜区 整合优化方案的批复 国函〔2026〕53号 自然资源部、生态环境部、国家林草局： 《自然资源部、生态环境部关于报请批准浙江、福建、...", doc_no:"国函〔2026〕53号", pub_org:"国务院" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7072484.htm", summary:"国务院关于浙江、福建、山东等3省 国家级自然保护区和国家级风景名胜区 整合优化方案的批复 国函〔2026〕53号 自然资源部、生态环境部、国家林草局： 《自然资源部、生态环境部关于报请批准浙江、福建、...", doc_no:"国函〔2026〕53号", pub_org:"国务院", is_new:false },
   { id:"n79", title:"国务院关于印发《实施就业优先战略“十五五”规划》的通知", source:"中国政府网",
     issuer_level:"国务院", importance:"high", date_signed:null, date_published:"2026-06-17",
     story_line:"实施就业优先战略\"十五五\"规划", stage:"公布执行", cross_dept:false,
     lead_dept:"国务院", support_depts:[],
     actors:[{name:"国务院", role:"权袋子", action:"实施就业优先战略“十五五”规划"}], rules:["实施就业优先战略“十五五”规划"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7072482.htm", summary:"国务院关于印发《实施就业优先战略 “十五五”规划》的通知 国发〔2026〕16号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 现将《实施就业优先战略“十五五”规划》印发给你们，请认真贯彻...", doc_no:"国发〔2026〕16号", pub_org:"国务院" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7072482.htm", summary:"国务院关于印发《实施就业优先战略 “十五五”规划》的通知 国发〔2026〕16号 各省、自治区、直辖市人民政府，国务院各部委、各直属机构： 现将《实施就业优先战略“十五五”规划》印发给你们，请认真贯彻...", doc_no:"国发〔2026〕16号", pub_org:"国务院", is_new:false },
   { id:"n80", title:"住房城乡建设部 国家数据局关于全面建立房屋建筑统一代码制度的通知", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-06-17",
     story_line:"住房城乡建设部 国家数据局关于全面建立房屋建筑统一代码制度的通知", stage:"细则落地", cross_dept:true,
     lead_dept:"住房城乡建设部", support_depts:["国家数据局"],
     actors:[{name:"住房城乡建设部", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家数据局", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["房产", "科技"], primary_tag:"房产",
-    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7072543.htm", summary:"住房城乡建设部 国家数据局关于全面建立房屋建筑统一代码制度的通知 建办〔2026〕32号 各省、自治区、直辖市住房城乡建设厅（委、管委）及有关部门、数据管理部门，新疆生产建设兵团住房城乡建设局、数据局...", doc_no:"建办〔2026〕32号", pub_org:"住房城乡建设部 国家数据局" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7072543.htm", summary:"住房城乡建设部 国家数据局关于全面建立房屋建筑统一代码制度的通知 建办〔2026〕32号 各省、自治区、直辖市住房城乡建设厅（委、管委）及有关部门、数据管理部门，新疆生产建设兵团住房城乡建设局、数据局...", doc_no:"建办〔2026〕32号", pub_org:"住房城乡建设部 国家数据局", is_new:false },
   { id:"n81", title:"人力资源社会保障部等4部门关于支持海洋经济发展促进就业创业的通知", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-06-16",
     story_line:"人力资源社会保障部等4部门关于支持海洋经济发展促进就业创业的通知", stage:"细则落地", cross_dept:true,
     lead_dept:"人力资源社会保障部", support_depts:["自然资源部", "国家发展改革委", "交通运输部"],
     actors:[{name:"人力资源社会保障部", role:"权袋子", action:"出规划/准入/标准"}, {name:"自然资源部", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家发展改革委", role:"权袋子", action:"出规划/准入/标准"}, {name:"交通运输部", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7072347.htm", summary:"人力资源社会保障部等4部门关于支持海洋经济发展促进就业创业的通知 人社部发〔2026〕32号 各省、自治区、直辖市及新疆生产建设兵团人力资源社会保障厅（局）、自然资源（海洋）主管部门、发展改革委、交通...", doc_no:"人社部发〔2026〕32号", pub_org:"人力资源社会保障部 自然资源部 国家发展改革委 交通运输部" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7072347.htm", summary:"人力资源社会保障部等4部门关于支持海洋经济发展促进就业创业的通知 人社部发〔2026〕32号 各省、自治区、直辖市及新疆生产建设兵团人力资源社会保障厅（局）、自然资源（海洋）主管部门、发展改革委、交通...", doc_no:"人社部发〔2026〕32号", pub_org:"人力资源社会保障部 自然资源部 国家发展改革委 交通运输部", is_new:false },
   { id:"n82", title:"关于印发《实施多式联运攻坚 打通堵点卡点行动方案（2026-2030年）》的通知", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-06-16",
     story_line:"实施多式联运攻坚 打通堵点卡点行动方案（2026-2030年）", stage:"公布执行", cross_dept:true,
     lead_dept:"交通运输部", support_depts:["国家发展改革委", "财政部", "自然资源部", "国家铁路局", "中国民航局", "国家邮政局", "中国国家铁路集团有限公司"],
     actors:[{name:"国家发展改革委", role:"钱袋子", action:"实施多式联运攻坚 打通堵点卡点行动方案（2026-2030年）"}, {name:"财政部", role:"钱袋子", action:"实施多式联运攻坚 打通堵点卡点行动方案（2026-2030年）"}, {name:"交通运输部", role:"权袋子", action:"实施多式联运攻坚 打通堵点卡点行动方案（2026-2030年）"}, {name:"国家发展改革委", role:"权袋子", action:"实施多式联运攻坚 打通堵点卡点行动方案（2026-2030年）"}, {name:"自然资源部", role:"权袋子", action:"实施多式联运攻坚 打通堵点卡点行动方案（2026-2030年）"}, {name:"国家铁路局", role:"权袋子", action:"实施多式联运攻坚 打通堵点卡点行动方案（2026-2030年）"}, {name:"国家邮政局", role:"权袋子", action:"实施多式联运攻坚 打通堵点卡点行动方案（2026-2030年）"}], rules:["实施多式联运攻坚 打通堵点卡点行动方案（2026-2030年）"], money_moved:true, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7072253.htm", summary:"交通运输部 国家发展改革委 财政部 自然资源部 国家铁路局 中国民航局 国家邮政局 中国国家铁路集团有限公司关于印发《实施多式联运攻坚 打通堵点卡点行动方案（2026-2030年）》的通知 交规划发〔...", doc_no:"交规划发〔2026〕51号", pub_org:"交通运输部 国家发展改革委 财政部 自然资源部 国家铁路局 中国民航局 国家邮政局 中国国家铁路集团有限公司" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7072253.htm", summary:"交通运输部 国家发展改革委 财政部 自然资源部 国家铁路局 中国民航局 国家邮政局 中国国家铁路集团有限公司关于印发《实施多式联运攻坚 打通堵点卡点行动方案（2026-2030年）》的通知 交规划发〔...", doc_no:"交规划发〔2026〕51号", pub_org:"交通运输部 国家发展改革委 财政部 自然资源部 国家铁路局 中国民航局 国家邮政局 中国国家铁路集团有限公司", is_new:false },
   { id:"n83", title:"关于印发《都市圈城际通勤效率提升工程实施方案（2026－2030年）》的通知", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-06-16",
     story_line:"都市圈城际通勤效率提升工程实施方案（2026－2030年）", stage:"公布执行", cross_dept:true,
     lead_dept:"交通运输部", support_depts:["国家发展改革委", "自然资源部", "住房城乡建设部", "国家铁路局", "中国民用航空局", "国家邮政局", "中国国家铁路集团有限公司"],
     actors:[{name:"交通运输部", role:"权袋子", action:"都市圈城际通勤效率提升工程实施方案（2026－2030年）"}, {name:"国家发展改革委", role:"权袋子", action:"都市圈城际通勤效率提升工程实施方案（2026－2030年）"}, {name:"自然资源部", role:"权袋子", action:"都市圈城际通勤效率提升工程实施方案（2026－2030年）"}, {name:"住房城乡建设部", role:"权袋子", action:"都市圈城际通勤效率提升工程实施方案（2026－2030年）"}, {name:"国家铁路局", role:"权袋子", action:"都市圈城际通勤效率提升工程实施方案（2026－2030年）"}, {name:"中国民用航空局", role:"权袋子", action:"都市圈城际通勤效率提升工程实施方案（2026－2030年）"}, {name:"国家邮政局", role:"权袋子", action:"都市圈城际通勤效率提升工程实施方案（2026－2030年）"}], rules:["都市圈城际通勤效率提升工程实施方案（2026－2030年）"], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["政务"], primary_tag:"政务",
-    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7072250.htm", summary:"交通运输部 国家发展改革委 自然资源部 住房城乡建设部 国家铁路局 中国民用航空局 国家邮政局 中国国家铁路集团有限公司关于印发《都市圈城际通勤效率提升工程实施方案（2026－2030年）》的通知 交...", doc_no:"交规划发〔2026〕49号", pub_org:"交通运输部 国家发展改革委 自然资源部 住房城乡建设部 国家铁路局 中国民用航空局 国家邮政局 中国国家铁路集团有限公司" },
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7072250.htm", summary:"交通运输部 国家发展改革委 自然资源部 住房城乡建设部 国家铁路局 中国民用航空局 国家邮政局 中国国家铁路集团有限公司关于印发《都市圈城际通勤效率提升工程实施方案（2026－2030年）》的通知 交...", doc_no:"交规划发〔2026〕49号", pub_org:"交通运输部 国家发展改革委 自然资源部 住房城乡建设部 国家铁路局 中国民用航空局 国家邮政局 中国国家铁路集团有限公司", is_new:false },
   { id:"n84", title:"关于开展重点行业节能降碳改造攻坚三年行动的通知", source:"中国政府网",
     issuer_level:"部委/机构", importance:"medium", date_signed:null, date_published:"2026-06-15",
     story_line:"关于开展重点行业节能降碳改造攻坚三年行动的通知", stage:"细则落地", cross_dept:true,
     lead_dept:"国家发展改革委", support_depts:["工业和信息化部", "生态环境部", "国务院国资委", "国家能源局"],
     actors:[{name:"国家发展改革委", role:"权袋子", action:"出规划/准入/标准"}, {name:"工业和信息化部", role:"权袋子", action:"出规划/准入/标准"}, {name:"生态环境部", role:"权袋子", action:"出规划/准入/标准"}, {name:"国家能源局", role:"权袋子", action:"出规划/准入/标准"}], rules:[], money_moved:false, power_moved:true,
     upstream:[], midstream:[], downstream:[], topic_tags:["能源"], primary_tag:"能源",
-    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7072084.htm", summary:"国家发展改革委等部门关于开展重点行业节能降碳改造攻坚三年行动的通知 发改环资〔2026〕698号 各省、自治区、直辖市及计划单列市、新疆生产建设兵团发展改革委、工业和信息化主管部门、生态环境厅（局）、...", doc_no:"发改环资〔2026〕698号", pub_org:"国家发展改革委 工业和信息化部 生态环境部 国务院国资委 国家能源局" }
+    link:"https://www.gov.cn/zhengce/zhengceku/202606/content_7072084.htm", summary:"国家发展改革委等部门关于开展重点行业节能降碳改造攻坚三年行动的通知 发改环资〔2026〕698号 各省、自治区、直辖市及计划单列市、新疆生产建设兵团发展改革委、工业和信息化主管部门、生态环境厅（局）、...", doc_no:"发改环资〔2026〕698号", pub_org:"国家发展改革委 工业和信息化部 生态环境部 国务院国资委 国家能源局", is_new:false }
 ];
 /* NEWS_DATA_END */
 
@@ -1012,6 +1047,11 @@ const NEWS = [
     ② 无 link → 跳转到权威网站站内检索该政策标题（fallback）
   可信来源预置：新华网 / 人民网 / 中国政府网，改 NEWS_SITE 切换默认源。
 */
+/* LOCAL_MATCHES_START */
+/* 自动匹配于 2026-07-16 20:58，零人工自动判定（要素共鸣，非因果关系） */
+const LOCAL_MATCHES = [{"region": "北京", "title": "北京市疾病预防控制局等单位关于印发高中阶段及以下新生肺结核筛查工作方案的通知", "link": "https://www.beijing.gov.cn/zhengce/zhengcefagui/202607/t20260715_4763847.html", "date": "2026-07-15", "central": "医药代表管理办法", "central_date": "2026-06-30", "score": 0.95, "tier": "strong", "transmission": "正向(中央→地方)", "resonance": ["预防控制", "病预防控", "疾病预防"], "org": "国家疾病预防控制局"}, {"region": "北京", "title": "北京市规划和自然资源委员会关于临时用地审批推行全程网办的通知", "link": "https://www.beijing.gov.cn/zhengce/zhengcefagui/202607/t20260713_4759452.html", "date": "2026-07-13", "central": "中共中央办公厅 国务院办公厅关于完善自然资源资产管理制度体系的意见", "central_date": "2026-07-13", "score": 0.401, "tier": "strong", "transmission": "正向(中央→地方)", "resonance": ["自然资源"], "org": "自然资源部"}, {"region": "北京", "title": "北京市规划和自然资源委员会关于印发《北京市全域土地综合整治工作规范（试行）》的通知", "link": "https://www.beijing.gov.cn/zhengce/zhengcefagui/202607/t20260708_4751733.html", "date": "2026-07-08", "central": "中共中央办公厅 国务院办公厅关于完善自然资源资产管理制度体系的意见", "central_date": "2026-07-13", "score": 0.398, "tier": "strong", "transmission": "参考(地方早于中央·仅供参照)", "resonance": ["自然资源"], "org": "自然资源部"}, {"region": "海南", "title": "中共海南省委 海南省人民政府关于深化养老服务改革发展的实施意见", "link": "https://www.hainan.gov.cn/hainan/swygwj/202605/6173bdef6dbf4ba682edcef5681fd6e8.shtml", "date": "2026-05-07", "central": "城乡三级养老服务网络建设管理指引", "central_date": "2026-07-08", "score": 0.447, "tier": "strong", "transmission": "参考(地方早于中央·仅供参照)", "resonance": ["养老服务"], "org": "民政部"}, {"region": "海南", "title": "海南省人民政府办公厅关于印发《海南省“十五五”加快农业农村现代化规划》的通知", "link": "https://www.hainan.gov.cn/hainan/szfbgtwj/202606/ab6086ef0da84cbfbee6177ded8bf21c.shtml", "date": "2026-06-18", "central": "加快农业农村现代化\"十五五\"规划", "central_date": "2026-06-20", "score": 0.95, "tier": "strong", "transmission": "参考(地方早于中央·仅供参照)", "resonance": ["加快农业", "业农村现", "农业农村", "村现代化", "农村现代"], "org": "民政部"}, {"region": "深圳", "title": "深圳市医疗保障局关于支持购买普惠型商业补充医疗保险有关事项的通知", "link": "https://www.sz.gov.cn/cn/xxgk/zfxxgj/tzgg/content/post_12803412.html", "date": "2026-04-14", "central": "医药代表管理办法", "central_date": "2026-06-30", "score": 0.473, "tier": "strong", "transmission": "参考(地方早于中央·仅供参照)", "resonance": ["医疗保障"], "org": "国家医疗保障局"}, {"region": "江苏", "title": "省政府关于进一步完善投融资机制加快高速公路和干线航道建设的意见", "link": "http://www.jiangsu.gov.cn/art/2026/4/15/art_46143_11757872.html", "date": "2026-04-01", "central": "国务院办公厅关于进一步完善大中型水库移民后期扶持政策的通知", "central_date": "2026-07-10", "score": 0.95, "tier": "strong", "transmission": "参考(地方早于中央·仅供参照)", "resonance": ["一步完善", "进一步完", "于进一步"], "org": ""}, {"region": "江苏", "title": "省政府办公厅关于促进江苏省政府投资基金高质量发展的实施意见", "link": "http://www.jiangsu.gov.cn/art/2026/3/2/art_46144_11734281.html", "date": "2026-03-02", "central": "国务院办公厅关于加强监管防范风险促进私募投资基金高质量发展的指导意见", "central_date": "2026-06-20", "score": 0.95, "tier": "strong", "transmission": "参考(地方早于中央·仅供参照)", "resonance": ["高质量发", "质量发展", "量发展的", "资基金高", "基金高质"], "org": ""}, {"region": "北京", "title": "北京市科学技术委员会、中关村科技园区管理委员会关于印发《北京市科技行政处罚裁量权适用规定》的通知", "link": "https://www.beijing.gov.cn/zhengce/zhengcefagui/202607/t20260715_4764203.html", "date": "2026-07-15", "central": "国家互联网信息办公室 中华人民共和国国家发展和改革委员会 中华人民共和国工业和 信息化部 中华人民共和国公安部 国家市场监督管理总局令（第21号） 人工智能拟人化互动服务管理暂行办法", "central_date": "2026-06-20", "score": 0.035, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "科学技术部", "board": "科技"}, {"region": "北京", "title": "北京市交通委员会关于修订印发《北京市互联网租赁自行车运营服务监督管理办法（试行）》的通知", "link": "https://www.beijing.gov.cn/zhengce/zhengcefagui/202607/t20260715_4763877.html", "date": "2026-07-15", "central": "国家互联网信息办公室 中华人民共和国国家发展和改革委员会 中华人民共和国工业和 信息化部 中华人民共和国公安部 国家市场监督管理总局令（第21号） 人工智能拟人化互动服务管理暂行办法", "central_date": "2026-06-20", "score": 0.053, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "", "board": "科技"}, {"region": "北京", "title": "​北京市人力资源和社会保障局关于2026年积分落户公示及落户办理有关工作的通告", "link": "https://www.beijing.gov.cn/zhengce/zhengcefagui/202607/t20260713_4759022.html", "date": "2026-07-13", "central": "人力资源社会保障部等4部门关于支持海洋经济发展促进就业创业的通知", "central_date": "2026-06-16", "score": 0.097, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "人力资源社会保障部", "board": "政务"}, {"region": "北京", "title": "北京市交通委员会等部门关于印发 《北京市继续促进国四排放标准老旧营运货车报废更新实施细则》的通知", "link": "https://www.beijing.gov.cn/zhengce/zhengcefagui/202607/t20260713_4760484.html", "date": "2026-07-13", "central": "生态环境部等部门采取行动保护治理群众身边水环境", "central_date": "2026-07-14", "score": 0.02, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "", "board": "环保"}, {"region": "北京", "title": "北京市教育委员会关于做好2026年“1+3”培养实验工作的通知", "link": "https://www.beijing.gov.cn/zhengce/zhengcefagui/202607/t20260710_4757010.html", "date": "2026-07-10", "central": "教育发展\"十五五\"规划", "central_date": "2026-07-10", "score": 0.022, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "教育部", "board": "教育"}, {"region": "北京", "title": "北京市政务服务和数据管理局关于印发《北京市公共数据资源授权运营管理办法》的通知", "link": "https://www.beijing.gov.cn/zhengce/zhengcefagui/202607/t20260709_4754544.html", "date": "2026-07-09", "central": "国家互联网信息办公室 中华人民共和国国家发展和改革委员会 中华人民共和国工业和 信息化部 中华人民共和国公安部 国家市场监督管理总局令（第21号） 人工智能拟人化互动服务管理暂行办法", "central_date": "2026-06-20", "score": 0.011, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "国家数据局", "board": "科技"}, {"region": "北京", "title": "北京市教育委员会关于印发《北京市高中阶段教辅材料评议推荐目录》的通知", "link": "https://www.beijing.gov.cn/zhengce/zhengcefagui/202607/t20260709_4754507.html", "date": "2026-07-09", "central": "教育发展\"十五五\"规划", "central_date": "2026-07-10", "score": 0.028, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "教育部", "board": "教育"}, {"region": "北京", "title": "北京市住房和城乡建设委员会关于调整《北京市住房城乡建设系统行政处罚裁量基准》部分条款的通知", "link": "https://www.beijing.gov.cn/zhengce/zhengcefagui/202607/t20260706_4749434.html", "date": "2026-07-06", "central": "住房城乡建设部 国家数据局关于全面建立房屋建筑统一代码制度的通知", "central_date": "2026-06-17", "score": 0.122, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "住房城乡建设部", "board": "房产"}, {"region": "北京", "title": "北京市经济和信息化局等单位关于印发《北京市推动高精尖产业深化产教融合行动方案（2026—2028年）》的通知", "link": "https://www.beijing.gov.cn/zhengce/zhengcefagui/202607/t20260703_4745764.html", "date": "2026-07-03", "central": "实施多式联运攻坚 打通堵点卡点行动方案（2026-2030年）", "central_date": "2026-06-16", "score": 0.052, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "工业和信息化部", "board": "政务"}, {"region": "北京", "title": "北京市规划和自然资源委员会关于印发《行政处罚裁量基准表（2026年修订）》的通知", "link": "https://www.beijing.gov.cn/zhengce/zhengcefagui/202607/t20260707_4750950.html", "date": "2026-07-07", "central": "中共中央办公厅 国务院办公厅关于完善自然资源资产管理制度体系的意见", "central_date": "2026-07-13", "score": 0.052, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "自然资源部", "board": "环保"}, {"region": "北京", "title": "北京市教育委员会关于民办高等学校民办非学历高等教育机构2026年秋季招生政策的通告", "link": "https://www.beijing.gov.cn/zhengce/zhengcefagui/202607/t20260702_4744306.html", "date": "2026-07-02", "central": "教育发展\"十五五\"规划", "central_date": "2026-07-10", "score": 0.021, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "教育部", "board": "教育"}, {"region": "北京", "title": "北京市经济和信息化局关于印发《北京市关于加快促进数字经济企业出海的若干措施》的通知", "link": "https://www.beijing.gov.cn/zhengce/zhengcefagui/202607/t20260702_4744527.html", "date": "2026-07-02", "central": "促进平台经济大中小企业协同发展行动方案（2026—2028年）", "central_date": "2026-06-18", "score": 0.055, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "工业和信息化部", "board": "科技"}, {"region": "北京", "title": "北京市科学技术委员会、中关村科技园区管理委员会关于开展2026年度北京市自然科学研究系列职称评审申报工作的通知", "link": "https://www.beijing.gov.cn/zhengce/zhengcefagui/202607/t20260702_4743454.html", "date": "2026-07-02", "central": "国家互联网信息办公室 中华人民共和国国家发展和改革委员会 中华人民共和国工业和 信息化部 中华人民共和国公安部 国家市场监督管理总局令（第21号） 人工智能拟人化互动服务管理暂行办法", "central_date": "2026-06-20", "score": 0.032, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "科学技术部", "board": "科技"}, {"region": "北京", "title": "中共北京市委教育科技人才工作领导小组关于印发《北京市加快推进人工智能赋能科学研究实施方案（2026-2028年）》的通知", "link": "https://www.beijing.gov.cn/zhengce/zhengcefagui/202607/t20260702_4743249.html", "date": "2026-07-02", "central": "关于加快推进\"人工智能＋人社\"应用发展的实施意见", "central_date": "2026-07-08", "score": 0.179, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "教育部", "board": "科技"}, {"region": "北京", "title": "北京市住房和城乡建设委员会等单位关于印发《北京市建筑绿色发展要求落实情况查验工作指南（试行）》的通知", "link": "https://www.beijing.gov.cn/zhengce/zhengcefagui/202607/t20260701_4741688.html", "date": "2026-07-01", "central": "住房城乡建设部 国家数据局关于全面建立房屋建筑统一代码制度的通知", "central_date": "2026-06-17", "score": 0.056, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "住房城乡建设部", "board": "房产"}, {"region": "北京", "title": "北京市经济和信息化局关于印发《北京市经济和信息化领域行政处罚裁量基准》的通知", "link": "https://www.beijing.gov.cn/zhengce/zhengcefagui/202606/t20260629_4737181.html", "date": "2026-06-29", "central": "人力资源社会保障部 国家发展改革委 工业和信息化部 农业农村部关于实施创业模式引领 行动的通知", "central_date": "2026-06-30", "score": 0.059, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "工业和信息化部", "board": "政务"}, {"region": "北京", "title": "北京市体育局 北京市卫生健康委员会关于印发《北京市关于推动运动促进健康事业高质量发展的实施意见》的通知", "link": "https://www.beijing.gov.cn/zhengce/zhengcefagui/202606/t20260626_4732125.html", "date": "2026-06-26", "central": "医药代表管理办法", "central_date": "2026-06-30", "score": 0.079, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "国家卫生健康委", "board": "健康"}, {"region": "上海", "title": "上海市人民政府关于加强2026世界人工智能大会暨人工智能全球治理高级别会议期间无人机等“低慢小”航空器安全管理的通告", "link": "https://www.shanghai.gov.cn/nw12344/20260712/3192944f4eea40cc84cc5ba0550d4263.html", "date": "2026-07-12", "central": "关于加快推进\"人工智能＋人社\"应用发展的实施意见", "central_date": "2026-07-08", "score": 0.087, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "民政部", "board": "科技"}, {"region": "上海", "title": "市政府新闻发布会介绍《上海市推进乡村全面振兴“十五五”规划》有关情况", "link": "https://www.shanghai.gov.cn/nw12344/20260708/0eb8f956f0e2460cb6ed182752bbeda3.html", "date": "2026-07-08", "central": "体育强国建设\"十五五\"规划", "central_date": "2026-07-02", "score": 0.074, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "", "board": "政务"}, {"region": "上海", "title": "国家金融监督管理总局 上海市人民政府关于印发《加快上海国际再保险中心建设的若干措施》的通知", "link": "https://www.shanghai.gov.cn/nw12344/20260707/a9492a7157ff4ee3bf2c040270796b26.html", "date": "2026-07-07", "central": "国家金融监督管理总局 中国人民银行公告（金规〔2026〕2 号） 个人贷款业务明示综合融资成本规定", "central_date": "2026-06-20", "score": 0.165, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "民政部", "board": "财政"}, {"region": "上海", "title": "上海市发展和改革委员会关于车用汽、柴油价格的通知（2026年7月3日）", "link": "https://www.shanghai.gov.cn/nw12344/20260703/20adf08fe8564e2ab579001c2904f9b4.html", "date": "2026-07-03", "central": "新型能源体系建设\"十五五\"规划", "central_date": "2026-07-03", "score": 0.022, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "", "board": "能源"}, {"region": "上海", "title": "上海市人民政府办公厅转发市住房城乡建设管理委、市房屋管理局《关于推进物业行业提质增效的实施意见》的通知", "link": "https://www.shanghai.gov.cn/nw12344/20260625/bcffe62ae13247e1ae6aa8d621273a5d.html", "date": "2026-06-25", "central": "住房城乡建设部 国家数据局关于全面建立房屋建筑统一代码制度的通知", "central_date": "2026-06-17", "score": 0.108, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "住房城乡建设部", "board": "房产"}, {"region": "四川", "title": "访谈解读：《四川省加快推进“人工智能+”一号创新工程实施方案》", "link": "https://www.sc.gov.cn/10462/wjjdscsjktjrgznyhcxgcssfa/newzxft2025.shtml", "date": "", "central": "关于加快推进\"人工智能＋人社\"应用发展的实施意见", "central_date": "2026-07-08", "score": 0.236, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "", "board": "科技"}, {"region": "四川", "title": "图解：成都市激发产业创新活力专项行动方案", "link": "https://www.sc.gov.cn/10462/10464/13298/13300/2026/6/9/da10a329d1c24b2495764525eadb2603.shtml", "date": "2026-06-09", "central": "促进平台经济大中小企业协同发展行动方案（2026—2028年）", "central_date": "2026-06-18", "score": 0.045, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "", "board": "科技"}, {"region": "四川", "title": "省政府印发方案：造氛围、建生态、育企业 专项行动推动“创业在成都”", "link": "https://www.sc.gov.cn/10462/10464/10797/2026/6/4/f8f46613444641b68ee810f699ffb2e5.shtml", "date": "2026-06-04", "central": "\"十五五\"碳达峰行动方案", "central_date": "2026-07-09", "score": 0.016, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "", "board": "环保"}, {"region": "海南", "title": "中共海南省委办公厅 海南省人民政府办公厅关于印发《海南省进一步扩大民间投资促进民营经济高质量发展若干措施》的通知", "link": "https://www.hainan.gov.cn/hainan/swygwj/202606/de207e909a7742d3bc6a988e1680dbab.shtml", "date": "", "central": "国务院办公厅关于加强监管防范风险促进私募投资基金高质量发展的指导意见", "central_date": "2026-06-20", "score": 0.097, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "民政部", "board": "财政"}, {"region": "海南", "title": "中共海南省委办公厅 海南省人民政府办公厅印发《关于进一步促进新型农村集体经济提质增效的若干措施》的通知", "link": "https://www.hainan.gov.cn/hainan/swygwj/202605/6cf39b4cd2c1481fa855db8c9e0477e6.shtml", "date": "", "central": "国务院办公厅关于进一步完善大中型水库移民后期扶持政策的通知", "central_date": "2026-07-10", "score": 0.077, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "民政部", "board": "政务"}, {"region": "海南", "title": "中共海南省委 海南省人民政府关于贯彻落实《教育强国建设规划纲要（2024—2035年）》加快建设教育强省的实施意见", "link": "https://www.hainan.gov.cn/hainan/swygwj/202509/38378ee6c10044d8a7aad649261bf38a.shtml", "date": "", "central": "教育发展\"十五五\"规划", "central_date": "2026-07-10", "score": 0.026, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "教育部", "board": "教育"}, {"region": "海南", "title": "海南省人民政府关于印发《“十五五”海南国家生态文明试验区规划（美丽海南建设“十五五”规划）》的通知", "link": "https://www.hainan.gov.cn/hainan/szfwj/202607/ea6127b6d5da4d76a62f43d63febe931.shtml", "date": "", "central": "美丽中国建设\"十五五\"规划", "central_date": "2026-07-03", "score": 0.247, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "民政部", "board": "环保"}, {"region": "海南", "title": "海南省人民政府办公厅关于印发《海南省“十五五”社会信用体系建设规划》的通知", "link": "https://www.hainan.gov.cn/hainan/szfbgtwj/202607/26402261f2184e39af28d5f11ead9101.shtml", "date": "", "central": "现代化应急体系建设\"十五五\"规划", "central_date": "2026-06-20", "score": 0.175, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "民政部", "board": "政务"}, {"region": "海南", "title": "海南省人民政府办公厅关于印发《海南省“十五五”科技创新规划》的通知", "link": "https://www.hainan.gov.cn/hainan/szfbgtwj/202607/9c64f40ebd3240f49eed6531c6413913.shtml", "date": "", "central": "促进平台经济大中小企业协同发展行动方案（2026—2028年）", "central_date": "2026-06-18", "score": 0.01, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "民政部", "board": "科技"}, {"region": "海南", "title": "海南省人民政府办公厅关于印发《海南省“十五五”水安全保障规划》的通知", "link": "https://www.hainan.gov.cn/hainan/szfbgtwj/202607/cfe5378668354fbfa8c3de950bcc38e0.shtml", "date": "", "central": "实施就业优先战略\"十五五\"规划", "central_date": "2026-06-30", "score": 0.079, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "民政部", "board": "政务"}, {"region": "海南", "title": "海南省人民政府办公厅关于印发《“十五五”海南国际旅游消费中心规划》的通知", "link": "https://www.hainan.gov.cn/hainan/szfbgtwj/202607/64ba085fd30746bf9bb7be33ab743d1f.shtml", "date": "2026-07-01", "central": "扩大消费\"十五五\"规划", "central_date": "2026-07-13", "score": 0.052, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "民政部", "board": "财政"}, {"region": "海南", "title": "海南省人民政府办公厅关于印发《海南省“十五五”市场监管高质量发展规划》的通知", "link": "https://www.hainan.gov.cn/hainan/szfbgtwj/202606/394c360c37cd4bb2a9b0b9cc9b2a3f54.shtml", "date": "", "central": "实施就业优先战略\"十五五\"规划", "central_date": "2026-06-30", "score": 0.073, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "国家市场监督管理总局", "board": "政务"}, {"region": "海南", "title": "海南省人民政府办公厅关于印发《海南热带雨林国家公园国家生态产品价值实现机制试点实施方案（2026-2028年）》的通知", "link": "https://www.hainan.gov.cn/hainan/szfbgtwj/202606/97ace9e83a984de4bb3c9351daff37b2.shtml", "date": "2026-06-26", "central": "美丽中国建设全民行动促进计划（2026-2030年）", "central_date": "2026-06-25", "score": 0.042, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "民政部", "board": "环保"}, {"region": "海南", "title": "海南省人民政府办公厅关于印发《“技能自贸港”五年行动方案（2026-2030年）》的通知", "link": "https://www.hainan.gov.cn/hainan/szfbgtwj/202606/96af190609fa4ff5a342b76345ed592f.shtml", "date": "", "central": "实施多式联运攻坚 打通堵点卡点行动方案（2026-2030年）", "central_date": "2026-06-16", "score": 0.182, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "民政部", "board": "政务"}, {"region": "海南", "title": "海南省人民政府办公厅关于印发《海南省“十五五”公共服务规划》的通知", "link": "https://www.hainan.gov.cn/hainan/szfbgtwj/202606/76e299dd2b1249c9a54f713c0caee2ab.shtml", "date": "", "central": "实施就业优先战略\"十五五\"规划", "central_date": "2026-06-30", "score": 0.082, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "民政部", "board": "政务"}, {"region": "海南", "title": "海南省人民政府办公厅关于印发《海南省“十五五”高新技术产业发展规划》的通知", "link": "https://www.hainan.gov.cn/hainan/szfbgtwj/202606/fabdc494e23b48fea1092bafac564a4e.shtml", "date": "", "central": "实施就业优先战略\"十五五\"规划", "central_date": "2026-06-30", "score": 0.072, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "民政部", "board": "政务"}, {"region": "海南", "title": "海南省自然资源和规划厅", "link": "http://lr.hainan.gov.cn/xxgk_317/newxxgk_index.html", "date": "", "central": "中共中央办公厅 国务院办公厅关于完善自然资源资产管理制度体系的意见", "central_date": "2026-07-13", "score": 0.088, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "自然资源部", "board": "环保"}, {"region": "海南", "title": "海南省人民政府关于废止海南经济特区农药批发零售经营许可管理办法的决定", "link": "https://www.hainan.gov.cn/hainan/fzfztz/202403/fb007173067448b6ba812d3ed2db1dcc.shtml", "date": "", "central": "中华人民共和国交通运输部令（2026年第10号） 公共航空运输企业经营许可规定", "central_date": "2026-06-30", "score": 0.078, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "民政部", "board": "政务"}, {"region": "海南", "title": "海南省人民政府关于修改《海南省城镇从业人员基本医疗保险条例实施细则》等二件政府规章的决定", "link": "https://www.hainan.gov.cn/hainan/fzfztz/202301/dd4d9016cf114d11a5d14564b70f99e0.shtml", "date": "", "central": "医药代表管理办法", "central_date": "2026-06-30", "score": 0.015, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "民政部", "board": "健康"}, {"region": "海南", "title": "海南省人民政府关于废止《海南省城镇从业人员基本养老保险条例实施细则》等三件省政府规章的决定", "link": "https://www.hainan.gov.cn/hainan/fzfztz/202211/be71bd4e01f94da2a76ea6698118a0d7.shtml", "date": "", "central": "关于印发国家基本药物目录（2026年版）的通知", "central_date": "2026-07-09", "score": 0.015, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "民政部", "board": "健康"}, {"region": "海南", "title": "海南省人民政府关于印发海南自由贸易港享受个人所得税优惠政策高端紧缺人才清单管理暂行办法的通知", "link": "https://www.hainan.gov.cn/hainan/fzfztz/202209/3d9971f8ba7349c19d09f9fca03df24d.shtml", "date": "", "central": "国家金融监督管理总局 中国人民银行公告（金规〔2026〕2 号） 个人贷款业务明示综合融资成本规定", "central_date": "2026-06-20", "score": 0.013, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "民政部", "board": "财政"}, {"region": "海南", "title": "海南省人民政府关于废止《海南省建帐监督管理办法》的决定", "link": "https://www.hainan.gov.cn/hainan/fzfztz/202202/636d00e6b3a441ca97a96a68aca69e79.shtml", "date": "", "central": "中华人民共和国民政部令（第82号） 社会组织评估管理办法", "central_date": "2026-07-10", "score": 0.053, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "民政部", "board": "政务"}, {"region": "深圳", "title": "深圳市发展和改革委员会 深圳市财政局 深圳市商务局关于印发《深圳市超长期特别国债资金支持消费品以旧换新提质增效实施方案(2026年)》的通知", "link": "https://www.sz.gov.cn/cn/xxgk/zfxxgj/tzgg/content/post_12659000.html", "date": "2026-02-14", "central": "利用外资固稳促优行动方案", "central_date": "2026-06-22", "score": 0.032, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "商务部", "board": "财政"}, {"region": "深圳", "title": "深圳市人民政府关于印发深圳市住房公积金管理办法的通知", "link": "https://www.sz.gov.cn/cn/xxgk/zfxxgj/tzgg/content/post_12803412.html", "date": "2026-03-16", "central": "住房城乡建设部 国家数据局关于全面建立房屋建筑统一代码制度的通知", "central_date": "2026-06-17", "score": 0.015, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "住房城乡建设部", "board": "房产"}, {"region": "深圳", "title": "深圳市商务局关于印发《深圳市国际化消费环境建设试点专项资金管理办法》的通知", "link": "https://www.sz.gov.cn/cn/xxgk/zfxxgj/tzgg/content/post_12803412.html", "date": "2026-04-15", "central": "中国证券监督管理委员会令（第234号） 衍生品交易监督管理办法（试行）", "central_date": "2026-06-30", "score": 0.03, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "商务部", "board": "财政"}, {"region": "深圳", "title": "深圳市卫生健康委关于印发《深圳市居民健康积分管理办法》的通知", "link": "https://www.sz.gov.cn/cn/xxgk/zfxxgj/tzgg/content/post_12803412.html", "date": "2026-04-15", "central": "医药代表管理办法", "central_date": "2026-06-30", "score": 0.11, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "国家卫生健康委", "board": "健康"}, {"region": "深圳", "title": "深圳市商务局关于印发《深圳市消费新业态新模式新场景试点城市建设资金管理办法》的通知", "link": "https://www.sz.gov.cn/cn/xxgk/zfxxgj/tzgg/content/post_12803412.html", "date": "2026-04-29", "central": "中国证券监督管理委员会令（第234号） 衍生品交易监督管理办法（试行）", "central_date": "2026-06-30", "score": 0.028, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "商务部", "board": "财政"}, {"region": "深圳", "title": "深圳市南山区人民政府关于印发《南山区支持创新创业“六个一”行动方案》的通知", "link": "https://www.szns.gov.cn/ztzl/slh/zcfg/content/post_12750064.html", "date": "2026-04-21", "central": "促进平台经济大中小企业协同发展行动方案（2026—2028年）", "central_date": "2026-06-18", "score": 0.041, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "民政部", "board": "科技"}, {"region": "深圳", "title": "深圳市宝安区科技创新局关于印发《深圳市宝安区推动人工智能赋能产业创新发展的若干措施》的通知", "link": "https://www.baoan.gov.cn/gkmlpt/content/12/12841/post_12841737.html", "date": "2026-06-11", "central": "关于加快推进\"人工智能＋人社\"应用发展的实施意见", "central_date": "2026-07-08", "score": 0.066, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "", "board": "科技"}, {"region": "江苏", "title": "省政府关于印发江苏省服务业扩能提质行动方案（2026－2030年）的通知", "link": "http://www.jiangsu.gov.cn/art/2026/6/11/art_46143_11783953.html", "date": "2026-06-01", "central": "都市圈城际通勤效率提升工程实施方案（2026－2030年）", "central_date": "2026-06-16", "score": 0.156, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "", "board": "政务"}, {"region": "江苏", "title": "省政府办公厅关于印发江苏省优化营商环境行动方案（2026版）的通知", "link": "http://www.jiangsu.gov.cn/art/2026/6/5/art_46144_11779356.html", "date": "2026-06-05", "central": "实施多式联运攻坚 打通堵点卡点行动方案（2026-2030年）", "central_date": "2026-06-16", "score": 0.058, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "", "board": "政务"}, {"region": "江苏", "title": "省政府办公厅关于印发江苏省促进残疾人就业若干措施的通知", "link": "http://www.jiangsu.gov.cn/art/2026/6/2/art_46144_11779210.html", "date": "2026-06-02", "central": "退役军人就业创业促进条例", "central_date": "2026-06-30", "score": 0.078, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "", "board": "政务"}, {"region": "江苏", "title": "省政府办公厅印发关于进一步支持城市更新行动若干政策措施的通知", "link": "http://www.jiangsu.gov.cn/art/2026/5/21/art_46144_11774390.html", "date": "2026-05-02", "central": "国务院办公厅关于进一步完善大中型水库移民后期扶持政策的通知", "central_date": "2026-07-10", "score": 0.095, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "", "board": "政务"}, {"region": "江苏", "title": "省政府办公厅关于印发江苏省落实水资源刚性约束制度考核实施方案的通知", "link": "http://www.jiangsu.gov.cn/art/2026/5/18/art_46144_11772724.html", "date": "2026-05-01", "central": "都市圈城际通勤效率提升工程实施方案（2026－2030年）", "central_date": "2026-06-16", "score": 0.063, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "", "board": "政务"}, {"region": "江苏", "title": "省政府办公厅关于印发江苏省治理交通拥堵专项行动方案的通知", "link": "http://www.jiangsu.gov.cn/art/2026/4/15/art_46144_11757928.html", "date": "2026-04-01", "central": "实施多式联运攻坚 打通堵点卡点行动方案（2026-2030年）", "central_date": "2026-06-16", "score": 0.058, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "", "board": "政务"}, {"region": "江苏", "title": "省政府办公厅关于进一步完善设区市与市辖区财政体制的意见", "link": "http://www.jiangsu.gov.cn/art/2026/3/31/art_46144_11752057.html", "date": "2026-03-03", "central": "商务部等9部门关于加快零售业创新发展的意见", "central_date": "2026-07-09", "score": 0.036, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "财政部", "board": "财政"}, {"region": "江苏", "title": "省政府办公厅关于印发江苏省生态空间管控区域管理办法的通知", "link": "http://www.jiangsu.gov.cn/art/2026/2/11/art_46144_11728947.html", "date": "2026-02-01", "central": "中共中央办公厅 国务院办公厅关于完善自然资源资产管理制度体系的意见", "central_date": "2026-07-13", "score": 0.039, "tier": "board", "transmission": "板块关联", "resonance": [], "org": "", "board": "环保"}];
+/* LOCAL_MATCHES_END */
+
 const NEWS_SITES = {
   xinhua:  { name:"新华网", url: q => `https://so.news.cn/#search/0/${encodeURIComponent(q)}/1/` },
   people:  { name:"人民网", url: q => `http://search.people.cn/s/?keyword=${encodeURIComponent(q)}&st=0` },
@@ -1122,7 +1162,9 @@ function buildStories(list){
       upstream: uniq(items.flatMap(n=>n.upstream)),
       midstream: uniq(items.flatMap(n=>n.midstream)),
       downstream: uniq(items.flatMap(n=>n.downstream)),
-      roles: uniq(allActors.map(a=>a.role))
+      roles: uniq(allActors.map(a=>a.role)),
+      has_new: items.some(n=>n.is_new),
+      newCount: items.filter(n=>n.is_new).length
     });
   }
   // 脉络按「最新更新时间」倒序：最近有新动静的脉络排在最前
@@ -1139,6 +1181,57 @@ function incubation(items){
 
 /* ================= 渲染 ================= */
 const ALL_STORIES = buildStories(NEWS);
+
+/* 地方匹配索引：central_story_line(normSl) → [地方落实节点] */
+const LOCAL_MAP = (() => {
+  const norm = s => (s||"").replace(/[\u201c\u201d\u201e\u201f\u2033\u2036]/g,'"')
+    .replace(/[\u2018\u2019\u201a\u201b]/g,"'").replace(/[《》〈〉【】\[\]]/g,'')
+    .replace(/\s+/g,' ').trim();
+  const m = new Map();
+  (LOCAL_MATCHES||[]).forEach(x => {
+    const k = norm(x.central);
+    if(!m.has(k)) m.set(k, []);
+    m.get(k).push(x);
+  });
+  return m;
+})();
+
+/* 地方落实模块总开关：false 则全站不渲染「地方政策落实」区（无需重新抓取 gov.cn）。
+   区域源筛选仍由 update_news.py 的 REGIONS 控制；此为页面级总闸。 */
+const LOCAL_ENABLED = true;
+
+/* 地方落实覆盖区域：按用户指定顺序固定展示（深圳暂无数据也占位）。海南有数据，附在末尾 */
+const REGION_ORDER = ["北京","上海","深圳","四川","江苏","海南"];
+const REGION_HAS = new Set((LOCAL_MATCHES||[]).map(x=>x.region));
+const LOCAL_REGIONS = REGION_ORDER.filter(r => REGION_HAS.has(r) || r === "深圳");
+
+/* 把匹配器吐出的重叠 n-gram 窗口（如 疾病预防/病预防控/预防控制）合并回原词，
+   避免「要素共鸣」区出现 garbled 拼接。仅用于展示，不改变匹配逻辑。 */
+function _mergeResonance(arr){
+  let grams = [...new Set(arr||[])];
+  let changed = true;
+  while (changed){
+    changed = false;
+    outer:
+    for (let i=0;i<grams.length;i++){
+      for (let j=0;j<grams.length;j++){
+        if (i===j) continue;
+        const a = grams[i], b = grams[j];
+        let ov = 0;
+        for (let k=1;k<Math.min(a.length,b.length);k++){
+          if (a.slice(-k) === b.slice(0,k)) ov = k;
+        }
+        if (ov >= 3){   // 保守阈值：仅合并同源滑动窗口，避免误合异义词
+          grams = grams.filter((_,idx)=> idx!==i && idx!==j);
+          grams.push(a + b.slice(ov));
+          changed = true;
+          break outer;
+        }
+      }
+    }
+  }
+  return grams;
+}
 
 function renderStats(){
   byId("stats").innerHTML = `
@@ -1265,10 +1358,51 @@ function renderStoryCard(s){
     : `<span class="none">暂无宏观链路数据</span>`;
 
   // 脉络内逐条新闻明细：常驻显示（不再需要「展开明细」按钮），置于卡片顶部
-  const detail = `<div class="detail"><div class="detail-inner">
-      <div class="detail-hd">脉络内逐条新闻（${s.items.length}）</div>
-      ${s.items.map(renderNewsDetail).join("")}
-    </div></div>`;
+  const detail = `<div class="detail">
+      <div class="detail-hd">📋 脉络内逐条新闻（${s.items.length}）</div>
+      <div class="detail-body">${s.items.map(renderNewsDetail).join("")}</div>
+    </div>`;
+
+  // 地方落实 · 政策雷达：防御性「要素共鸣」呈现（非因果关系）
+  const localSec = (() => {
+    const norm = s => (s||"").replace(/[\u201c\u201d\u201e\u201f\u2033\u2036]/g,'"')
+      .replace(/[\u2018\u2019\u201a\u201b]/g,"'").replace(/[《》〈〉【】\[\]]/g,'')
+      .replace(/\s+/g,' ').trim();
+    const arr = LOCAL_MAP.get(norm(s.name));
+    if(!arr || !arr.length) return "";
+    // 按地方新闻发布时间倒序（最晚的排最上）；无日期的排到最后。
+    // 仅到「月」的日期（YYYY-MM）视为该月末，比较时补 -99，避免与同月「日」错位。
+    const _dkey = d => (d && d.length === 7) ? d + "-99" : d;
+    const sorted = arr.slice().sort((a,b)=>{
+      const da = a.date || "", db = b.date || "";
+      if(!da) return 1;
+      if(!db) return -1;
+      const ka = _dkey(da), kb = _dkey(db);
+      return kb < ka ? -1 : (kb > ka ? 1 : 0);
+    });
+    const nodes = sorted.map(m => {
+      const strong = m.tier === "strong";
+      const isBoard = m.tier === "board";
+      const tierTxt = strong ? "强线索" : (isBoard ? "板块关联" : "弱线索");
+      let arrow;
+      if (isBoard) arrow = "◐ 同板块" + (m.board ? "·" + esc(m.board) : "");
+      else if (m.transmission && m.transmission.indexOf("参考") === 0) arrow = "◔ 地方早于中央·仅供参照";
+      else if (m.transmission && m.transmission.indexOf("引用") >= 0) arrow = "↓ 引用中央旧文";
+      else arrow = "↓ 中央→地方";
+      const dateTxt = m.date ? esc(m.date) : "日期未收录";
+      const metaBits = [dateTxt];
+      if (m.org) metaBits.push("对口 " + esc(m.org));
+      metaBits.push("相似度 " + esc(String(m.score)));
+      const metaLine = metaBits.join(" · ");
+      return `<div class="li-node ${strong?'li-strong':(isBoard?'li-board':'li-weak')}">
+        <div class="li-top"><span class="li-region">${esc(m.region)}</span><span class="li-tier">${tierTxt}</span><span class="li-arrow">${arrow}</span></div>
+        <a class="li-title" href="${esc(m.link)}" target="_blank" rel="noopener">${esc(m.title)}</a>
+        <div class="li-meta">${metaLine}</div>
+      </div>`;
+    }).join("");
+    const regionTags = REGION_ORDER.map(r=>`<span class="li-hd-region${REGION_HAS.has(r)?'':' li-hd-region-empty'}">${esc(r)}${REGION_HAS.has(r)?'':' · 暂无'}</span>`).join("");
+    return `<div class="local-impl"><div class="li-hd"><span>🛰 地方政策落实 · 政策雷达</span><span class="li-hd-regions">${regionTags}</span></div><div class="li-body">${nodes}</div></div>`;
+  })();
 
   // 六步拆解状态摘要（折叠时显示一行）
   const stepStatus = s.closed
@@ -1280,14 +1414,13 @@ function renderStoryCard(s){
       <div class="sh-main">
         <div class="sh-line"><span class="sh-name">${esc(s.name)}</span></div>
         <div class="sh-meta"><span>最高层级 <b>${esc(s.topLevel)}</b></span><span>最新阶段 <b>${esc(s.latestStage)}</b></span>${s.latestDate?`<span>更新 <b>${esc(s.latestDate)}</b></span>`:''}<span>共 <b>${s.items.length}</b> 条新闻</span></div>
-        <div class="tags">${s.tags.map(t=>`<span class="tag ${t===s.primaryTag?'primary':''} ${t===state.tab?'hot':''}">${esc(TAG_LABEL[t]||t)}</span>`).join("")}</div>
       </div>
       <span class="closed-badge ${s.closed?'yes':'no'}">${s.closed?'已闭环落地':'跟踪中'}</span>
     </div>
     ${detail}
     <details class="steps-details">
       <summary>
-        <span class="sd-title">六步法 · 政策落地拆解</span>
+        <span class="sd-title">⚙️ 六步法 · 政策落地拆解</span>
         ${stepStatus}
         <span class="sd-arw">▸</span>
       </summary>
@@ -1301,6 +1434,7 @@ function renderStoryCard(s){
         ${stepRow("⑥ 接宏观","上游→中游→下游",macroHtml)}
       </div>
     </details>
+    ${LOCAL_ENABLED ? localSec : ""}
   </div>`;
 }
 
@@ -1310,15 +1444,15 @@ function renderNewsDetail(n){
   const orgTxt = [n.pub_org, n.doc_no].filter(Boolean).join(" · ");
   const jump = canJump(n);
   return `<div class="news">
-    <div class="news-top"><div class="news-title">${esc(n.title)}${jump?` <a class="news-open" href="${esc(newsUrl(n))}" target="_blank" rel="noopener">查看原文 ↗</a>`:''}</div><div class="news-src">${esc(n.source)}</div></div>
+    <div class="news-top"><div class="news-title">${esc(n.title)}${jump?` <a class="news-open" href="${esc(newsUrl(n))}" target="_blank" rel="noopener">查看原文 ↗</a>`:''}</div></div>
     <div class="news-grid">
-      <div class="nf"><div class="k">① 层级 / 重要度</div><div class="v">${esc(n.issuer_level)} · ${({high:'高',medium:'中',low:'低'})[n.importance]}${n.cross_dept?' · 跨部门':''}</div></div>
-      <div class="nf"><div class="k">④ 时间</div><div class="v">${esc(dateTxt)}</div></div>
-      <div class="nf"><div class="k">发文机关 / 字号</div><div class="v">${esc(orgTxt)||'—'}</div></div>
-      <div class="nf"><div class="k">阶段</div><div class="v">${esc(n.stage)}</div></div>
-      <div class="nf"><div class="k">⑤ 钱/权</div><div class="v">${n.money_moved?'钱✓ ':''}${n.power_moved?'权✓':''}${(!n.money_moved&&!n.power_moved)?'未动作':''}</div></div>
+      <div class="nf"><div class="k">① 层级</div><div class="v">${esc(n.issuer_level)} · ${({high:'高',medium:'中',low:'低'})[n.importance]}${n.cross_dept?' · 跨部门':''}</div></div>
+      <div class="nf"><div class="k">② 时间</div><div class="v">${esc(dateTxt)}</div></div>
+      <div class="nf"><div class="k">③ 钱袋子/权袋子</div><div class="v">${roles}</div></div>
+      <div class="nf"><div class="k">④ 发文机关</div><div class="v">${esc(orgTxt)||'—'}</div></div>
+      <div class="nf"><div class="k">⑤ 阶段</div><div class="v">${esc(n.stage)}</div></div>
+      <div class="nf"><div class="k">⑥ 钱/权</div><div class="v">${n.money_moved?'钱✓ ':''}${n.power_moved?'权✓':''}${(!n.money_moved&&!n.power_moved)?'未动作':''}</div></div>
     </div>
-    <div class="nf" style="margin-top:8px"><div class="k">③ 钱袋子/权袋子</div><div class="v">${roles}</div></div>
     ${n.rules.length?`<div class="nf" style="margin-top:6px"><div class="k">制度</div><div class="v">${n.rules.map(esc).join("、")}</div></div>`:""}
     ${n.summary?`<div class="nf news-summary" style="margin-top:6px"><div class="k">📄 政策摘要</div><div class="v">${esc(n.summary)}</div></div>`:""}
   </div>`;
@@ -1329,7 +1463,7 @@ function renderNewsDetail(n){
 function renderStoryIndexRow(s,i){
   const tab = state.tab==="全部" ? "全部板块" : state.tab;
   const tagHtml = s.tags.map(t=>`<span class="idx-tag ${t===s.primaryTag?'primary':''}">${esc(TAG_LABEL[t]||t)}</span>`).join("");
-  return `<button class="idx-row" type="button" data-idx="${i}">
+  return `<button class="idx-row${s.has_new?' is-new':''}" type="button" data-idx="${i}">
     <span class="idx-no">${i+1}</span>
     <span class="idx-main">
       <span class="idx-title">${esc(s.name)}</span>
@@ -1478,7 +1612,7 @@ function renderViewbar(){
   });
   byId("vbHint").textContent = state.view==="carousel"
     ? "聚焦阅读：左右滑（← → 按钮 / 方向键 / 触屏滑动）细读单条脉络，点「返回脉络目录」回目录"
-    : "脉络目录：先纵览本板块全部脉络，点任意一条下钻进入聚焦阅读";
+    : "";
 }
 
 byId("reset").onclick = ()=>{ state.roles.clear(); state.stages.clear(); state.levels.clear(); state.carIndex=0; render(); };
