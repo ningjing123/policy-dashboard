@@ -1390,6 +1390,21 @@ function renderStoryCard(s){
       if(seen.has(k)) return;
       seen.add(k); all.push(n);
     });
+    // 日期窗口：教育/房产不过滤（地方新闻全显示）；其余分类只显示「今天往前 30 天」内的地方新闻
+    const NO_WINDOW = new Set(["教育","房产"]);
+    if(!NO_WINDOW.has(s.primaryTag)){
+      const cut = new Date();
+      cut.setDate(cut.getDate() - 30);
+      const _nd = d => {
+        if(!d) return null;
+        if(d.length === 10) return new Date(d.replace(/-/g,'/'));
+        if(d.length === 7){ const p = d.split('-'); return new Date(+p[0], +p[1], 0); } // 只到月→当月末
+        return null;
+      };
+      const kept = [];
+      all.forEach(n => { const nd = _nd(n.date); if(nd && nd >= cut) kept.push(n); });
+      all.length = 0; kept.forEach(n => all.push(n));
+    }
     if(!all.length) return "";
     // 按地方新闻发布时间倒序（最晚的排最上）；无日期的排到最后。
     // 仅到「月」的日期（YYYY-MM）视为该月末，比较时补 -99，避免与同月「日」错位。
